@@ -28,9 +28,9 @@ librispeech:
     # setup data
     cd adf
     just --unstable librispeech::download librispeech::extract
+    cd ..
 
     # create bucket file for asr fine-tuning
-    cd ..
     echo "0 3 5" | python3 s3prl/preprocess/generate_len_for_bucket.py -i {{superb-data-dir}}/LibriSpeech -o {{superb-data-dir}}/LibriSpeech -a .flac --n_jobs $(nproc)
 
 speech-commands:
@@ -45,5 +45,23 @@ speech-commands:
     # setup data
     cd adf
     just --unstable speech-commands::setup
+    cd ..
 
+common-voice:
+    #!/usr/bin/env bash
+    # setup paths
+    mkdir -p {{superb-data-dir}}
+    rm -f {{superb-data-dir}}/common-voice
 
+    # create symlink
+    ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/common-voice
+
+    # setup data
+    # cd adf
+    # just --unstable cv-v7-ood::setup
+    # cd ..
+
+    # pre-process data
+    cd s3prl/downstream/ctc/corpus/
+    bash preprocess_cv.sh {{superb-data-dir}}/common-voice/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/common-voice
+    cd ../../../

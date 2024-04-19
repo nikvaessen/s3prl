@@ -8,6 +8,7 @@ import torch
 import torchaudio
 import numpy as np
 from librosa import resample
+import joblib
 
 
 def read_processed_tsv(path):
@@ -29,16 +30,23 @@ def main():
 
     file_list = read_processed_tsv(args.tsv)
 
-    for file in tqdm(file_list):
+    def _fn(file):
         file = str(file)
         file = join(args.root, file)
         wav, sample_rate = torchaudio.load(file)
         wav = resample(
-            wav.squeeze(0).numpy(), sample_rate, 16000, res_type="kaiser_best"
+            wav.squeeze(0).numpy(), orig_sr=sample_rate, target_sr=16000,
+            res_type="kaiser_best"
         )
         wav = torch.FloatTensor(wav).unsqueeze(0)
         new_file = file[:-3] + "wav"
         torchaudio.save(new_file, wav, 16000)
+
+    parallel = joblib.Parallel(n_jobs=-1, return_as='generator')
+    generator = parallel(joblib.delayed(_fn)(f) for f in file_list)
+
+    for _ in tqdm(generator, total=len(file_list)):
+        pass
 
 
 if __name__ == "__main__":

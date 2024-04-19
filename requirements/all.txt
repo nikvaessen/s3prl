@@ -31,3 +31,4 @@ pydantic
 sed_eval
 more_itertools
 tensorboard
+resampy
