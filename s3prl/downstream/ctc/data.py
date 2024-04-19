@@ -13,8 +13,12 @@ def collect_audio_batch(batch, split, half_batch_size_wav_len=300000):
        e.g. [(file1,txt1),(file2,txt2),...]
     '''
     def audio_reader(filepath):
-        wav, sample_rate = torchaudio.load(filepath)
-        return wav.reshape(-1)
+        try:
+            wav, sample_rate = torchaudio.load(filepath)
+            return wav.reshape(-1)
+        except RuntimeError as e:
+            print(filepath)
+            raise ValueError(f"{filepath} is fucked")
 
     # Bucketed batch should be [[(file1,txt1),(file2,txt2),...]]
     if type(batch[0]) is not tuple:

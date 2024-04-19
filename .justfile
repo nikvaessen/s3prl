@@ -57,11 +57,25 @@ common-voice:
     ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/common-voice
 
     # setup data
-    # cd adf
-    # just --unstable cv-v7-ood::setup
-    # cd ..
+    cd adf
+    just --unstable cv-v7-ood::setup
+    cd ..
 
     # pre-process data
     cd s3prl/downstream/ctc/corpus/
     bash preprocess_cv.sh {{superb-data-dir}}/common-voice/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/common-voice
     cd ../../../
+
+SBCDAE:
+    #!/usr/bin/env bash
+    # setup paths
+    mkdir -p {{superb-data-dir}}
+    rm -f {{superb-data-dir}}/SBCSAE
+
+    # create symlink
+    ln -s {{adf-work-dir}}/SBCSAE/extract/ {{superb-data-dir}}/SBCSAE
+
+    # setup data
+    cd adf
+    just --unstable SBCSAE::setup
+    cd ..

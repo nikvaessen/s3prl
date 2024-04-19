@@ -36,11 +36,12 @@ speech-recognition experiment-name learning-rate=lr:
     # test
     python3 run_downstream.py -m evaluate -t "test-clean" -e {{exp-dir}}/{{experiment-name}}/asr/dev-clean-best.ckpt
 
-ood-speech-recognition experiment-name language learning-rate=lr:
-    echo 'to be implemented'
-    just _ood_asr-cv {{experiment-name}} es {{learning-rate}}
-    just _ood_asr-cv {{experiment-name}} ar {{learning-rate}}
-    just _ood_asr-cv {{experiment-name}} zh {{learning-rate}}
+ood-speech-recognition experiment-name learning-rate=lr:
+    #!/usr/bin/env bash
+    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} es {{learning-rate}}
+    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} ar {{learning-rate}}
+    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} zh {{learning-rate}}
+    just -f .downstream.justfile _ood-asr-SBCSAE {{experiment-name}} {{learning-rate}}
 
 _ood-asr-cv experiment-name lang learning-rate=lr:
     # train
@@ -61,6 +62,24 @@ _ood-asr-cv experiment-name lang learning-rate=lr:
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}}/dev-best.ckpt
 
+_ood-asr-SBCSAE experiment-name learning-rate=lr:
+    # train
+    python3 run_downstream.py \
+    -m train -u fbank -d ctc \
+    -p {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE \
+    -c downstream/ctc/sbcsae.yaml \
+    -o \
+    config.downstream_expert.corpus.path={{data-dir}}/SBCSAE/wav,,\
+    config.downstream_expert.corpus.train=[\"{{data-dir}}/SBCSAE/tsv/train.tsv\"],,\
+    config.downstream_expert.corpus.test=[\"{{data-dir}}//SBCSAE/tsv/dev.tsv\"],,\
+    config.downstream_expert.corpus.dev=[\"{{data-dir}}//SBCSAE/tsv/test.tsv\"],,\
+    config.downstream_expert.corpus.num_workers={{num-workers}},,\
+    config.optimizer.lr={{learning-rate}},,\
+    config.runner.total_steps=1000,,\
+    config.runner.eval_step=500
+
+    # test
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE/dev-best.ckpt
 
 keyword-spotting experiment-name learning-rate=lr:
     # train
@@ -72,6 +91,7 @@ keyword-spotting experiment-name learning-rate=lr:
     config.downstream_expert.datarc.speech_commands_test_root={{data-dir}}/speech-commands/test,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
+
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ks/dev-best.ckpt
 
