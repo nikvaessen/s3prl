@@ -87,7 +87,7 @@ def main():
     
     if 'librilight' in args.input_data.lower():
         SETS = ['small', 'medium', 'large'] + ['small-splitted', 'medium-splitted', 'large-splitted']
-    elif 'librispeech' in args.input_data.lower():
+    elif 'librispeech' in args.input_data.lower() or "ls100h" in args.input_data.lower():
         SETS = ['train-clean-100', 'train-clean-360', 'train-other-500', 'dev-clean', 'dev-other', 'test-clean', 'test-other']
     elif 'timit' in args.input_data.lower():
         SETS = ['TRAIN', 'TEST']
