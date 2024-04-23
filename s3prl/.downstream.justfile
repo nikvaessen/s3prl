@@ -215,5 +215,12 @@ source-separation experiment-name learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt
 
 speech-enhancement experiment-name learning-rate=lr:
-    echo 'to be implemented'
+    # train
+    python3 run_downstream.py --mode train \
+        -d enhancement_stft -u wav2vec2  \
+        -c downstream/enhancement_stft/configs/cfg_voicebank.yaml \
+        -p {{exp-dir}}/{{experiment-name}}/se
+
+    # test
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/dev-best.ckpt
 

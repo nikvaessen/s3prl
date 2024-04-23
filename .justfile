@@ -210,3 +210,26 @@ cv-v4-translate:
     cd s3prl/downstream/speech_translation/prepare_data/
     bash prepare_covo.sh {{superb-data-dir}}/cv-v4-translate
     cd ../../../
+
+
+voicebank:
+    #!/usr/bin/env bash
+    # setup paths
+    mkdir -p {{superb-data-dir}}
+    rm -f {{superb-data-dir}}/voicebank
+
+    # create symlink
+    ln -s {{adf-work-dir}}/voicebank/extract/noisy-vctk-16k {{superb-data-dir}}/voicebank
+
+    # setup data
+    cd adf
+    just --unstable voicebank::setup
+    cd ..
+
+    # prepare train, dev and test data in Kaldi format
+    python s3prl/downstream/enhancement_stft/scripts/Voicebank/data_prepare.py\
+        {{superb-data-dir}}/voicebank s3prl/downstream/enhancement_stft/datasets/voicebank --part train
+    python s3prl/downstream/enhancement_stft/scripts/Voicebank/data_prepare.py \
+        {{superb-data-dir}}/voicebank s3prl/downstream/enhancement_stft/datasets/voicebank --part dev
+    python s3prl/downstream/enhancement_stft/scripts/Voicebank/data_prepare.py \
+        {{superb-data-dir}}/voicebank s3prl/downstream/enhancement_stft/datasets/voicebank --part test
