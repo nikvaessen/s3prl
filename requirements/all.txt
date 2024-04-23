@@ -33,3 +33,4 @@ more_itertools
 tensorboard
 resampy
 sacremoses
+fairseq==0.12.2

@@ -203,7 +203,7 @@ cv-v4-translate:
 
     # setup data
     cd adf
-    #just --unstable cv-v4-translate::setup
+    just --unstable cv-v4-translate::setup
     cd ..
 
     # pre-process data

@@ -182,7 +182,14 @@ slot-filling experiment-name learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sf/dev-best.ckpt
 
 speech-translation experiment-name learning-rate=lr:
-    echo 'to be implemented'
+    python3 run_downstream.py \
+    -m train -u fbank -d speech_translation \
+    -p {{exp-dir}}/{{experiment-name}}/st \
+    -o \
+    config.optimizer.lr={{learning-rate}}
+
+    # test
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt
 
 voice-conversion experiment-name learning-rate=lr:
     # train
@@ -197,7 +204,7 @@ voice-conversion experiment-name learning-rate=lr:
     # test
     echo 'todo'
 
-speech-separation experiment-name learning-rate=lr:
+source-separation experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
         -d separation_stft2 -u wav2vec2  \
