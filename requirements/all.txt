@@ -32,3 +32,4 @@ sed_eval
 more_itertools
 tensorboard
 resampy
+sacremoses

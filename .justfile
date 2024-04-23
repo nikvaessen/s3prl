@@ -199,14 +199,14 @@ cv-v4-translate:
     rm -f {{superb-data-dir}}/cv-v4-translate
 
     # create symlink
-    ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/cv-v4-translate
+    ln -s {{adf-work-dir}}/cv-v4-translate/extract/ {{superb-data-dir}}/cv-v4-translate
 
     # setup data
     cd adf
-    just --unstable cv-v4-translate::setup
+    #just --unstable cv-v4-translate::setup
     cd ..
 
     # pre-process data
     cd s3prl/downstream/speech_translation/prepare_data/
-    bash bash prepare_covo.sh {{superb-data-dir}}/cv-v4-translate
+    bash prepare_covo.sh {{superb-data-dir}}/cv-v4-translate
     cd ../../../

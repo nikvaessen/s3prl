@@ -1,4 +1,5 @@
 #!/usr/local/bin bash
+set -e
 
 # basic config
 covo_root=$1
