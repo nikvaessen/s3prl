@@ -15,7 +15,7 @@ phoneme-recognition experiment-name learning-rate=lr:
     -p {{exp-dir}}/{{experiment-name}}/pr \
     -c downstream/ctc/libriphone.yaml \
     -o \
-    config.downstream_expert.corpus.path={{data-dir}}/LibriSpeech,,\
+    config.downstream_expert.corpus.path={{data-dir}}/ls100h,,\
     config.downstream_expert.corpus.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
@@ -28,7 +28,7 @@ speech-recognition experiment-name learning-rate=lr:
     -m train -u fbank -d asr \
     -p {{exp-dir}}/{{experiment-name}}/asr \
     -o \
-    config.downstream_expert.datarc.libri_root={{data-dir}}/LibriSpeech,,\
+    config.downstream_expert.datarc.libri_root={{data-dir}}/ls100,,\
     config.downstream_expert.datarc.bucket_file={{data-dir}}/LibriSpeech/len_for_bucket,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
