@@ -7,6 +7,7 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 # common settings
 num-workers := "$(($(nproc)-1))"
 lr := "1e-5"
+default-num-layers := "1"
 
 phoneme-recognition experiment-name learning-rate=lr:
     # train
@@ -91,19 +92,42 @@ keyword-spotting experiment-name learning-rate=lr:
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ks/dev-best.ckpt
 
-query-by-example-spoken-term-detection experiment-name:
+query-by-example-spoken-term-detection experiment-name num-layers=default-num-layers:
     #!/usr/bin/env bash
-    layer=-1
-    # dev
-    python3 run_downstream.py \
-    -m evaluate -u hubert -l ${layer} \
-    -d quesst14_dtw -t "dev" \
-    -p {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev \
-    -o \
-    config.downstream_expert.dtwrc.dist_method=cosine,,\
-    config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14
+    # predicting
+    for layer in $(seq 1 {{num-layers}}); do
+        echo "layer: $layer with {{num-workers}} workers"
+        # dev
+        # -u hubert -l ${layer} \
+        python3 run_downstream.py \
+        -m evaluate -u fbank -d quesst14_dtw \
+        -t "dev" \
+        -p {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev \
+        -o \
+        "config.downstream_expert.dtwrc.dist_method=cosine,,\
+        config.downstream_expert.max_workers={{num-workers}},,\
+        config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
 
-    # TODO logic doing all layers and scoring the best one...
+        # test
+        python3 run_downstream.py \
+        -m evaluate -u fbank -d quesst14_dtw \
+        -t "test" \
+        -p {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test \
+        -o \
+        "config.downstream_expert.dtwrc.dist_method=cosine,,\
+        config.downstream_expert.max_workers={{num-workers}},,\
+        config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
+    done
+
+    # scoring
+    cd {{data-dir}}/quesst14/scoring/
+    for layer in $(seq 1 {{num-layers}}); do
+        # dev
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev groundtruth_quesst14_dev -10
+
+        # test
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10
+     done
 
 speaker-identificaton experiment-name learning-rate=lr:
     # train
@@ -112,7 +136,8 @@ speaker-identificaton experiment-name learning-rate=lr:
     -p {{exp-dir}}/{{experiment-name}}/sid \
     -o \
     config.downstream_expert.datarc.file_path={{data-dir}}/vc1,,\
-    config.optimizer.lr={{learning-rate}}
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
+    config.optimizer.lr={{learning-rate}},,
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt
@@ -124,6 +149,7 @@ speaker-verification experiment-name learning-rate=lr:
     -p {{exp-dir}}/{{experiment-name}}/asv \
     -o \
     config.downstream_expert.datarc.file_path={{data-dir}}/vc1,,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
@@ -141,6 +167,7 @@ speaker-diarization experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
+    # TODO test logic speaker diarization
     echo 'to be implemented'
 
 emotion-recognition experiment-name learning-rate=lr:
@@ -202,7 +229,8 @@ voice-conversion experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    echo 'todo'
+    # TODO VC test
+    echo 'to be implemented'
 
 source-separation experiment-name learning-rate=lr:
     # train

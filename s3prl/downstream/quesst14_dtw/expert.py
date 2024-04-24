@@ -115,7 +115,10 @@ class DownstreamExpert(nn.Module):
         # Calculate matching scores
         results = defaultdict(list)
         with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
+            print(f"started executor with {self.max_workers} workers")
             futures = []
+            total = len(queries) * len(docs)
+            str_len = len(str(total))
             for query, query_name in zip(queries, query_names):
                 if len(query) < 5:  # Do not consider too short queries
                     results[query_name] = [(doc_name, 0) for doc_name in doc_names]
@@ -133,6 +136,9 @@ class DownstreamExpert(nn.Module):
                             dtwrc,
                         )
                     )
+                    print(f'\rsubmitting {len(futures):{str_len}d}/{total}', end='')
+
+            print(f"\nwaiting for completion of total={len(futures)} jobs")
             for future in tqdm(
                 as_completed(futures), total=len(futures), ncols=0, desc="DTW"
             ):
