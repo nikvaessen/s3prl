@@ -194,7 +194,7 @@ speech-translation experiment-name learning-rate=lr:
 voice-conversion experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py \
-    -m train -d a2o-vc-vcc2020 -u wav2vec2  \
+    -m train -d a2o-vc-vcc2020 -u fbank \
     -p {{exp-dir}}/{{experiment-name}}/vc \
     -o \
     config.downstream_expert.trgspk=TEF1,,\
