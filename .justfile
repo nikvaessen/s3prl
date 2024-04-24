@@ -81,12 +81,12 @@ cv-v7-ood:
 
     # setup data
     cd adf
-    just --unstable cv-v7-ood::setup
+    # just --unstable cv-v7-ood::setup
     cd ..
 
     # pre-process data
     cd s3prl/downstream/ctc/corpus/
-    bash preprocess_cv.sh {{superb-data-dir}}/common-voice/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/common-voice
+    bash preprocess_cv.sh {{superb-data-dir}}/cv-v7-ood/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/cv-v7-ood
     cd ../../../
 
 SBCDAE:
