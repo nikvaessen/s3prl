@@ -34,4 +34,3 @@ tensorboard
 resampy
 sacremoses
 fairseq==0.12.2
-soundfile
