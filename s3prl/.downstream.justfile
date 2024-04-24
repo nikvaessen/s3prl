@@ -207,7 +207,7 @@ voice-conversion experiment-name learning-rate=lr:
 source-separation experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
-        -d separation_stft2 -u wav2vec2  \
+        -d separation_stft2 -u fbank  \
         -c downstream/separation_stft2/configs/cfg.yaml \
         -p {{exp-dir}}/{{experiment-name}}/ss
 
@@ -217,7 +217,7 @@ source-separation experiment-name learning-rate=lr:
 speech-enhancement experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
-        -d enhancement_stft -u wav2vec2  \
+        -d enhancement_stft -u fbank  \
         -c downstream/enhancement_stft/configs/cfg_voicebank.yaml \
         -p {{exp-dir}}/{{experiment-name}}/se
 
