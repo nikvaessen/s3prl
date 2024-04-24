@@ -81,7 +81,7 @@ cv-v7-ood:
 
     # setup data
     cd adf
-    # just --unstable cv-v7-ood::setup
+    just --unstable cv-v7-ood::setup
     cd ..
 
     # pre-process data
