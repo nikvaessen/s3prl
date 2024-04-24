@@ -175,6 +175,7 @@ speaker-diarization experiment-name learning-rate=lr:
 
 emotion-recognition experiment-name learning-rate=lr:
     #!/usr/bin/env bash
+    # TODO cross validation
     python3 run_downstream.py \
     -m train -u fbank -d emotion \
     -p {{exp-dir}}/{{experiment-name}}/er \

@@ -34,6 +34,8 @@ place-manual-downloads dir_with_archives:
 # setup the librispeech dataset
 ls100h:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/ls100h
@@ -52,6 +54,8 @@ ls100h:
 
 speech-commands:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/speech-commands
@@ -66,6 +70,8 @@ speech-commands:
 
 cv-v7-ood:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/cv-v7-ood
@@ -85,6 +91,8 @@ cv-v7-ood:
 
 SBCDAE:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/SBCSAE
@@ -99,6 +107,8 @@ SBCDAE:
 
 quesst14:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/quesst14
@@ -113,6 +123,8 @@ quesst14:
 
 vc1:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/vc1
@@ -127,6 +139,8 @@ vc1:
 
 librimix:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/librimix-sd
@@ -158,6 +172,8 @@ librimix:
 
 iemocap:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/iemocap
@@ -172,6 +188,8 @@ iemocap:
 
 fluent:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/fluent
@@ -186,6 +204,8 @@ fluent:
 
 snips:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/snips
@@ -200,6 +220,8 @@ snips:
 
 vcc2020:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/vcv2020
@@ -215,6 +237,8 @@ vcc2020:
 
 cv-v4-translate:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/cv-v4-translate
@@ -235,6 +259,8 @@ cv-v4-translate:
 
 voicebank:
     #!/usr/bin/env bash
+    set -e
+
     # setup paths
     mkdir -p {{superb-data-dir}}
     rm -f {{superb-data-dir}}/voicebank
@@ -248,6 +274,7 @@ voicebank:
     cd ..
 
     # prepare train, dev and test data in Kaldi format
+    rm -rf s3prl/downstream/enhancement_stft/datasets/voicebank
     python s3prl/downstream/enhancement_stft/scripts/Voicebank/data_prepare.py\
         {{superb-data-dir}}/voicebank s3prl/downstream/enhancement_stft/datasets/voicebank --part train
     python s3prl/downstream/enhancement_stft/scripts/Voicebank/data_prepare.py \
