@@ -27,9 +27,9 @@ place-manual-downloads dir_with_archives:
     rsync --mkpath {{dir_with_archives}}/snips.zip                                 "${ADF_DOWNLOAD_DIR}"/snips/download/
     rsync --mkpath {{dir_with_archives}}/vox1_dev_wav.zip                          "${ADF_DOWNLOAD_DIR}"/vc1/download/
     rsync --mkpath {{dir_with_archives}}/vox1_test_wav.zip                         "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    rsync --mkpath {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/
-    rsync --mkpath {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/
-    rsync --mkpath {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/
+    rsync --mkpath {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    rsync --mkpath {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    rsync --mkpath {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
 
 # setup the librispeech dataset
 ls100h:
