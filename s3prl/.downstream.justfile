@@ -28,8 +28,8 @@ speech-recognition experiment-name learning-rate=lr:
     -m train -u fbank -d asr \
     -p {{exp-dir}}/{{experiment-name}}/asr \
     -o \
-    config.downstream_expert.datarc.libri_root={{data-dir}}/ls100,,\
-    config.downstream_expert.datarc.bucket_file={{data-dir}}/LibriSpeech/len_for_bucket,,\
+    config.downstream_expert.datarc.libri_root={{data-dir}}/ls100h,,\
+    config.downstream_expert.datarc.bucket_file={{data-dir}}/ls100h/len_for_bucket,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
