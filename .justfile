@@ -18,18 +18,26 @@ install-dependencies:
 setup-data: ls100h speech-commands cv-v4-translate cv-v7-ood SBCDAE quesst14 vc1 librimix iemocap fluent snips vcc2020 voicebank
 
 place-manual-downloads dir_with_archives:
-    rsync --mkpath {{dir_with_archives}}/IEMOCAP_full_release_withoutVideos.tar.gz "${ADF_DOWNLOAD_DIR}"/iemocap/download/
-    rsync --mkpath {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-ar.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync --mkpath {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-es.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync --mkpath {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-zh-CN.tar.gz     "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync --mkpath {{dir_with_archives}}/en.tar.gz                                 "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
-    rsync --mkpath {{dir_with_archives}}/fluent.zip                                "${ADF_DOWNLOAD_DIR}"/fluent/download/
-    rsync --mkpath {{dir_with_archives}}/snips.zip                                 "${ADF_DOWNLOAD_DIR}"/snips/download/
-    rsync --mkpath {{dir_with_archives}}/vox1_dev_wav.zip                          "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    rsync --mkpath {{dir_with_archives}}/vox1_test_wav.zip                         "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    rsync --mkpath {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    rsync --mkpath {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    rsync --mkpath {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/iemocap/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/fluent/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/snips/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/vc1/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+
+    rsync {{dir_with_archives}}/IEMOCAP_full_release_withoutVideos.tar.gz "${ADF_DOWNLOAD_DIR}"/iemocap/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-ar.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-es.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-zh-CN.tar.gz     "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/en.tar.gz                                 "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
+    rsync {{dir_with_archives}}/fluent.zip                                "${ADF_DOWNLOAD_DIR}"/fluent/download/
+    rsync {{dir_with_archives}}/snips.zip                                 "${ADF_DOWNLOAD_DIR}"/snips/download/
+    rsync {{dir_with_archives}}/vox1_dev_wav.zip                          "${ADF_DOWNLOAD_DIR}"/vc1/download/
+    rsync {{dir_with_archives}}/vox1_test_wav.zip                         "${ADF_DOWNLOAD_DIR}"/vc1/download/
+    rsync {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    rsync {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    rsync {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
 
 # setup the librispeech dataset
 ls100h:
