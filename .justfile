@@ -142,6 +142,8 @@ librimix:
     cd ..
 
     # prepare separation
+    rm -rf s3prl/downstream/separation_stft2/datasets/Libri2Mix
+
     python s3prl/downstream/separation_stft2/scripts/LibriMix/data_prepare.py \
     --part train-100 {{superb-data-dir}}/librimix-ss s3prl/downstream/separation_stft2/datasets/Libri2Mix
 
