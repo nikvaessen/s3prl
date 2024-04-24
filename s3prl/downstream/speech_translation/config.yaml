@@ -36,7 +36,7 @@ downstream_expert:
     label_smoothing: 0.1
 
   taskrc:
-    data: data/covost_en_de ## set the data folder here
+    data: data/covost_en_de
     config_yaml: config.yaml
     seed: 1
     use_asr: False

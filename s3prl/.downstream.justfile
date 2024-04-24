@@ -7,7 +7,7 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 # common settings
 num-workers := "$(($(nproc)-1))"
 lr := "1e-5"
-default-num-layers := "1"
+default-num-layers := "12"
 
 phoneme-recognition experiment-name learning-rate=lr:
     # train
@@ -21,7 +21,7 @@ phoneme-recognition experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/pr/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/pr/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/pr/superb.pr.txt
 
 speech-recognition experiment-name learning-rate=lr:
     # train
@@ -35,16 +35,9 @@ speech-recognition experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -t "test-clean" -e {{exp-dir}}/{{experiment-name}}/asr/dev-clean-best.ckpt
+    python3 run_downstream.py -m evaluate -t "test-clean" -e {{exp-dir}}/{{experiment-name}}/asr/dev-clean-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
 
-ood-speech-recognition experiment-name learning-rate=lr:
-    #!/usr/bin/env bash
-    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} es {{learning-rate}}
-    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} ar {{learning-rate}}
-    just -f .downstream.justfile _ood-asr-cv {{experiment-name}} zh {{learning-rate}}
-    just -f .downstream.justfile _ood-asr-SBCSAE {{experiment-name}} {{learning-rate}}
-
-_ood-asr-cv experiment-name lang learning-rate=lr:
+ood-asr-cv experiment-name lang learning-rate=lr:
     # train
     python3 run_downstream.py \
     -m train -u fbank -d ctc \
@@ -59,9 +52,9 @@ _ood-asr-cv experiment-name lang learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}}/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}}/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.{{lang}}.ood-asr.txt
 
-_ood-asr-SBCSAE experiment-name learning-rate=lr:
+ood-asr-SBCSAE experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py \
     -m train -u fbank -d ctc \
@@ -76,7 +69,7 @@ _ood-asr-SBCSAE experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.sbcsae.ood-asr.txt
 
 keyword-spotting experiment-name learning-rate=lr:
     # train
@@ -90,7 +83,7 @@ keyword-spotting experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ks/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ks/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ks/superb.ks.txt
 
 query-by-example-spoken-term-detection experiment-name num-layers=default-num-layers:
     #!/usr/bin/env bash
@@ -140,7 +133,7 @@ speaker-identificaton experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}},,
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
 
 speaker-verification experiment-name learning-rate=lr:
     # train
@@ -183,10 +176,11 @@ emotion-recognition experiment-name learning-rate=lr:
     -o \
     config.downstream_expert.datarc.test_fold='fold1',,\
     config.downstream_expert.datarc.root={{data-dir}}/iemocap,,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/er/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/er/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/er/superb.er.txt
 
 intent-classification experiment-name learning-rate=lr:
     python3 run_downstream.py \
@@ -194,10 +188,11 @@ intent-classification experiment-name learning-rate=lr:
     -p {{exp-dir}}/{{experiment-name}}/ic \
     -o \
     config.downstream_expert.datarc.file_path={{data-dir}}/fluent,,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ic/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ic/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ic/superb.ic.txt
 
 slot-filling experiment-name learning-rate=lr:
     python3 run_downstream.py \
@@ -206,21 +201,23 @@ slot-filling experiment-name learning-rate=lr:
     -c downstream/ctc/snips.yaml \
     -o \
     config.downstream_expert.corpus.path={{data-dir}}/snips,,\
+    config.downstream_expert.corpus.num_workers={{num-workers}},,\
     config.downstream_expert.text.slots_file={{data-dir}}/snips/slots.txt,,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sf/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sf/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sf/superb.sf.txt
 
 speech-translation experiment-name learning-rate=lr:
     python3 run_downstream.py \
     -m train -u fbank -d speech_translation \
     -p {{exp-dir}}/{{experiment-name}}/st \
     -o \
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
 
 voice-conversion experiment-name learning-rate=lr:
     # train
@@ -230,6 +227,7 @@ voice-conversion experiment-name learning-rate=lr:
     -o \
     config.downstream_expert.trgspk=TEF1,,\
     config.downstream_expert.datarc.data_root={{data-dir}}/vcc2020/data,,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
@@ -239,20 +237,26 @@ voice-conversion experiment-name learning-rate=lr:
 source-separation experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
-        -d separation_stft2 -u fbank  \
-        -c downstream/separation_stft2/configs/cfg.yaml \
-        -p {{exp-dir}}/{{experiment-name}}/ss
+    -d separation_stft2 -u fbank  \
+    -c downstream/separation_stft2/configs/cfg.yaml \
+    -p {{exp-dir}}/{{experiment-name}}/ss \
+    -o \
+    config.downstream_expert.loaderrc.num_workers={{num-workers}},,\
+    config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
 
 speech-enhancement experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
-        -d enhancement_stft -u fbank  \
-        -c downstream/enhancement_stft/configs/cfg_voicebank.yaml \
-        -p {{exp-dir}}/{{experiment-name}}/se
+    -d enhancement_stft -u fbank  \
+    -c downstream/enhancement_stft/configs/cfg_voicebank.yaml \
+    -p {{exp-dir}}/{{experiment-name}}/se \
+    -o \
+    config.downstream_expert.loaderrc.num_workers={{num-workers}},,\
+    config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/dev-best.ckpt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
 
