@@ -153,6 +153,9 @@ librimix:
     python s3prl/downstream/separation_stft2/scripts/LibriMix/data_prepare.py \
     --part test {{superb-data-dir}}/librimix-ss s3prl/downstream/separation_stft2/datasets/Libri2Mix
 
+    # setup dscore
+    git clone git@github.com:nikvaessen/dscore.git s3prl/downstream/diarization/dscore
+
 iemocap:
     #!/usr/bin/env bash
     # setup paths

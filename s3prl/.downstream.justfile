@@ -164,11 +164,14 @@ speaker-diarization experiment-name learning-rate=lr:
     config.downstream_expert.loaderrc.train_dir={{data-dir}}/librimix-sd/train,,\
     config.downstream_expert.loaderrc.dev_dir={{data-dir}}/librimix-sd/dev,,\
     config.downstream_expert.loaderrc.test_dir={{data-dir}}/librimix-sd/test,,\
+    config.downstream_expert.loaderrc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
-    # test
-    # TODO test logic speaker diarization
-    echo 'to be implemented'
+    #test
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sd/best-states-dev.ckpt
+
+    # score
+    ./downstream/diarization/score.sh {{exp-dir}}/{{experiment-name}}/sd {{data-dir}}/librimix-sd/test
 
 emotion-recognition experiment-name learning-rate=lr:
     #!/usr/bin/env bash

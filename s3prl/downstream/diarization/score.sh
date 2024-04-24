@@ -20,7 +20,7 @@ scoring_dir="$1/scoring"
 infer_dir="${scoring_dir}/predictions"
 test_set="$2"
 # directory where you cloned dscore (https://github.com/ftshijt/dscore)
-dscore_dir=/groups/leo1994122701/dscore
+dscore_dir=downstream/diarization/dscore
 
 frame_shift_file=$1/frame_shift
 if [ -f $frame_shift_file ]; then
@@ -49,7 +49,7 @@ for med in 1 11; do
             --frame_shift=${frame_shift} --subsampling=1 --sampling_rate=${sr} \
             $scoring_log_dir/file_list $scoring_dir/hyp_${th}_$med.rttm
         python ${dscore_dir}/score.py -r ${test_set}/rttm -s $scoring_dir/hyp_${th}_$med.rttm \
-            > $scoring_dir/result_th${th}_med${med} 2>/dev/null || exit
+            > $scoring_dir/result_th${th}_med${med}  || exit
 
         # NIST scoring
         # md-eval.pl \
