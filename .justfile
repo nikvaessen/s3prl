@@ -260,6 +260,7 @@ cv-v4-translate:
     cd ..
 
     # pre-process data
+    rm -rf data/covost_en_de
     cd s3prl/downstream/speech_translation/prepare_data/
     bash prepare_covo.sh {{superb-data-dir}}/cv-v4-translate
     cd ../../../
