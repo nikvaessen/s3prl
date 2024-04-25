@@ -25,6 +25,9 @@ place-manual-downloads dir_with_archives:
     mkdir -p "${ADF_DOWNLOAD_DIR}"/snips/download/
     mkdir -p "${ADF_DOWNLOAD_DIR}"/vc1/download/
     mkdir -p "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/voicebank/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/quesst14/download/
 
     rsync {{dir_with_archives}}/IEMOCAP_full_release_withoutVideos.tar.gz "${ADF_DOWNLOAD_DIR}"/iemocap/download/
     rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-ar.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
@@ -38,6 +41,9 @@ place-manual-downloads dir_with_archives:
     rsync {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
     rsync {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
     rsync {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
+    rsync {{dir_with_archives}}/noisy-vctk-16k.zip                        "${ADF_DOWNLOAD_DIR}"/voicebank/download/
+    rsync {{dir_with_archives}}/wham_noise.zip                            "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/quesst14Database.tgz                      "${ADF_DOWNLOAD_DIR}"/quesst14/download/
 
 # setup the librispeech dataset
 ls100h:
@@ -260,7 +266,7 @@ cv-v4-translate:
     cd ..
 
     # pre-process data
-    rm -rf data/covost_en_de
+    rm -rf s3prl/data/covost_en_de/
     cd s3prl/downstream/speech_translation/prepare_data/
     bash prepare_covo.sh {{superb-data-dir}}/cv-v4-translate
     cd ../../../
