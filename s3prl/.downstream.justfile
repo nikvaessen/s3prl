@@ -246,8 +246,12 @@ voice-conversion experiment-name tgt-spk learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    ./downstream/a2o-vc-vcc2020/decode.sh {{data-dir}}/vcc2020/models/pwg_task1 {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}} {{tgt-spk}} {{data-dir}}/vcc2020/data
+    ./downstream/a2o-vc-vcc2020/decode.sh \
+        {{data-dir}}/vcc2020/models/pwg_task1 \
+        {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}} \
+        {{tgt-spk}} {{data-dir}}/vcc2020/data > {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}}/superb.vc.{{tgt-spk}}.txt
 
+    cat {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}}/superb.vc.{{tgt-spk}}.txt
 source-separation experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \
