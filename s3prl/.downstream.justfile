@@ -125,10 +125,12 @@ query-by-example-spoken-term-detection experiment-name num-layers=default-num-la
     cd {{data-dir}}/quesst14/scoring/
     for layer in $(seq 1 {{num-layers}}); do
         # dev
-        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev groundtruth_quesst14_dev -10
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev groundtruth_quesst14_dev -10 > {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev/superb.qbe.txt
+        cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev/superb.qbe.txt
 
         # test
-        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10 {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
+        cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
      done
 
 speaker-identificaton experiment-name learning-rate=lr:
@@ -156,7 +158,8 @@ speaker-verification experiment-name learning-rate=lr:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    ./downstream/sv_voxceleb1/test_expdir.sh {{exp-dir}}/{{experiment-name}}/asv {{data-dir}}/vc1
+    ./downstream/sv_voxceleb1/test_expdir.sh {{exp-dir}}/{{experiment-name}}/asv {{data-dir}}/vc1 > {{exp-dir}}/{{experiment-name}}/asv/superb.asv.txt
+    cat {{exp-dir}}/{{experiment-name}}/asv/superb.asv.txt
 
 speaker-diarization experiment-name learning-rate=lr:
     # train
@@ -174,7 +177,8 @@ speaker-diarization experiment-name learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sd/best-states-dev.ckpt
 
     # score
-    ./downstream/diarization/score.sh {{exp-dir}}/{{experiment-name}}/sd {{data-dir}}/librimix-sd/test
+    ./downstream/diarization/score.sh {{exp-dir}}/{{experiment-name}}/sd {{data-dir}}/librimix-sd/test > {{exp-dir}}/{{experiment-name}}/sd/superb.sd.txt
+    cat {{exp-dir}}/{{experiment-name}}/sd/superb.sd.txt
 
 emotion-recognition experiment-name fold learning-rate=lr:
     #!/usr/bin/env bash
