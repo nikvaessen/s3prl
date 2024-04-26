@@ -65,10 +65,7 @@ class DownstreamExpert(nn.Module):
             "meta_data": self.datarc['train_meta_data'],
             "max_timestep": self.datarc["max_timestep"],
         }
-        print(f"{train_config=}")
         self.train_dataset = SpeakerVerifi_train(**train_config)
-        print(f"{self.train_dataset=}")
-        print(f"{len(self.train_dataset)=}")
 
         dev_config = {
             "vad_config": self.datarc['vad_config'],
@@ -146,8 +143,6 @@ class DownstreamExpert(nn.Module):
 
     def _get_train_dataloader(self, dataset):
         sampler = DistributedSampler(dataset) if is_initialized() else None
-        print(f"{sampler=}")
-        print(f"{self.datarc['train_batch_size']=}")
         return DataLoader(
             dataset,
             batch_size=self.datarc['train_batch_size'],
