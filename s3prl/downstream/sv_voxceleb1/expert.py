@@ -65,7 +65,10 @@ class DownstreamExpert(nn.Module):
             "meta_data": self.datarc['train_meta_data'],
             "max_timestep": self.datarc["max_timestep"],
         }
+        print(f"{train_config=}")
         self.train_dataset = SpeakerVerifi_train(**train_config)
+        print(f"{self.train_dataset=}")
+        print(f"{len(self.train_dataset)=}")
 
         dev_config = {
             "vad_config": self.datarc['vad_config'],
