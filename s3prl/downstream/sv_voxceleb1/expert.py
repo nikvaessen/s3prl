@@ -143,9 +143,11 @@ class DownstreamExpert(nn.Module):
 
     def _get_train_dataloader(self, dataset):
         sampler = DistributedSampler(dataset) if is_initialized() else None
+        print(f"{sampler=}")
+        print(f"{self.datarc['train_batch_size']=}")
         return DataLoader(
             dataset,
-            batch_size=self.datarc['train_batch_size'], 
+            batch_size=self.datarc['train_batch_size'],
             shuffle=(sampler is None),
             sampler=sampler,
             num_workers=self.datarc['num_workers'],
