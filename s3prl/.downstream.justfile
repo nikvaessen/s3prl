@@ -107,6 +107,7 @@ query-by-example-spoken-term-detection experiment-name num-layers=default-num-la
         -o \
         "config.downstream_expert.dtwrc.dist_method=cosine,,\
         config.downstream_expert.max_workers={{num-workers}},,\
+        config.downstream_expert.datarc.num_workers={{num-workers}},,\
         config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
 
         # test
@@ -252,6 +253,7 @@ voice-conversion experiment-name tgt-spk learning-rate=lr:
         {{tgt-spk}} {{data-dir}}/vcc2020/data > {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}}/superb.vc.{{tgt-spk}}.txt
 
     cat {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}}/superb.vc.{{tgt-spk}}.txt
+
 source-separation experiment-name learning-rate=lr:
     # train
     python3 run_downstream.py --mode train \

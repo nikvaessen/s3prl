@@ -5,6 +5,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from functools import partial
 from pathlib import Path
 
+import joblib
 import numpy as np
 import torch
 import torch.nn as nn
@@ -114,36 +115,35 @@ class DownstreamExpert(nn.Module):
 
         # Calculate matching scores
         results = defaultdict(list)
-        with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
-            print(f"started executor with {self.max_workers} workers")
-            futures = []
-            total = len(queries) * len(docs)
-            str_len = len(str(total))
-            for query, query_name in zip(queries, query_names):
-                if len(query) < 5:  # Do not consider too short queries
-                    results[query_name] = [(doc_name, 0) for doc_name in doc_names]
-                    continue
-                for doc, doc_name in zip(docs, doc_names):
-                    futures.append(
-                        executor.submit(
-                            match,
-                            query,
-                            doc,
-                            query_name,
-                            doc_name,
-                            dist_fn,
-                            self.dtwrc["minmax_norm"],
-                            dtwrc,
-                        )
-                    )
-                    print(f'\rsubmitting {len(futures):{str_len}d}/{total}', end='')
 
-            print(f"\nwaiting for completion of total={len(futures)} jobs")
-            for future in tqdm(
-                as_completed(futures), total=len(futures), ncols=0, desc="DTW"
-            ):
-                query_name, doc_name, score = future.result()
-                results[query_name].append((doc_name, score))
+        print(f"started executor with {self.max_workers} workers")
+        total = len(queries) * len(docs)
+        str_len = len(str(total))
+
+        jobs_to_submit = []
+        for query, query_name in zip(queries, query_names):
+            if len(query) < 5:  # Do not consider too short queries
+                results[query_name] = [(doc_name, 0) for doc_name in doc_names]
+                continue
+
+            for doc, doc_name in zip(docs, doc_names):
+                jobs_to_submit.append(joblib.delayed(match)(
+                        query,
+                        doc,
+                        query_name,
+                        doc_name,
+                        dist_fn,
+                        self.dtwrc["minmax_norm"],
+                        dtwrc,
+                ))
+            print(f'\rsubmitting {len(jobs_to_submit):{str_len}d}/{total}', end='')
+
+        print(f"\nwaiting for completion of total={len(jobs_to_submit)} jobs")
+        parallel = joblib.Parallel(n_jobs=self.max_workers, return_as='generator')
+        for query_name, doc_name, score in tqdm(
+            parallel(jobs_to_submit), total=len(jobs_to_submit), ncols=0, desc="DTW"
+        ):
+            results[query_name].append((doc_name, score))
 
         # Normalize scores with regard to each query
         for query_name, doc_scores in results.items():
