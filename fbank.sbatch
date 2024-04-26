@@ -42,7 +42,7 @@ case $SLURM_ARRAY_TASK_ID in
         just --unstable downstream::ood-asr-cv "$NAME" ar
         ;;
     4)
-        just --unstable downstream::ood-asr-cv "$NAME" zh-CN
+        just --unstable downstream::ood-asr-cv "$NAME" zh
         ;;
     5)
         just --unstable downstream::ood-asr-SBCSAE "$NAME"
