@@ -14,6 +14,7 @@ default:
 install-dependencies:
     pip install -r adf/requirements.txt
     pip install -e ".[all]"
+    pip install -r s3prl/downstream/a2o-vc-vcc2020/requirements.txt
 
 setup-data: ls100h speech-commands cv-v4-translate cv-v7-ood SBCDAE quesst14 vc1 librimix iemocap fluent snips vcc2020 voicebank
 
@@ -238,11 +239,11 @@ vcc2020:
 
     # setup paths
     mkdir -p {{superb-data-dir}}
-    rm -f {{superb-data-dir}}/vcv2020
+    rm -f {{superb-data-dir}}/vcc2020
 
     # create symlink
-    ln -s {{adf-work-dir}}/vcc2020/extract/ {{superb-data-dir}}/vcc2020
-    mkdir -p {{adf-work-dir}}/vcc2020/extract/
+    ln -s {{adf-work-dir}}/vcc2020/extract {{superb-data-dir}}/vcc2020
+    mkdir -p {{adf-work-dir}}/vcc2020/extract
 
     # setup data
     cd adf

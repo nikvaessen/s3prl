@@ -9,10 +9,11 @@
 voc_dir=$1
 outdir=$2
 trgspk=$3
+datadir=$4
 
 # check arguments
-if [ $# != 3 ]; then
-    echo "Usage: $0 <voc_dir> <outdir> <trgspk>"
+if [ $# != 4 ]; then
+    echo "Usage: $0 <voc_dir> <outdir> <trgspk> <datadir>"
     exit 1
 fi
 
@@ -49,5 +50,5 @@ echo "successfully finished decoding."
 echo "Evaluation start."
 python downstream/a2o-vc-vcc2020/evaluate.py \
     --wavdir ${wav_dir} \
-    --data_root downstream/a2o-vc-vcc2020/data \
+    --data_root ${datadir} \
     --trgspk ${trgspk}

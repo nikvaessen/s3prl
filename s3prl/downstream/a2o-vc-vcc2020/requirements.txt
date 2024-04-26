@@ -1,4 +1,4 @@
-parallel-wavegan
+parallel-wavegan @ git+https://github.com/nikvaessen/ParallelWaveGAN.git@master
 fastdtw
 pyworld
 pysptk

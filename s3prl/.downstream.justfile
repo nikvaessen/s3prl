@@ -40,6 +40,9 @@ speech-recognition experiment-name learning-rate=lr:
     cat {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
 
 ood-asr-cv experiment-name lang learning-rate=lr:
+    # lang can be one of es, ar, zh-CN
+    printf "es\nar\nzh-CN\n" | grep --line-regexp -q '{{lang}}'
+
     # train
     python3 run_downstream.py \
     -m train -u fbank -d ctc \
@@ -228,20 +231,22 @@ speech-translation experiment-name learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
     cat {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
 
-voice-conversion experiment-name learning-rate=lr:
+voice-conversion experiment-name tgt-spk learning-rate=lr:
+    # tgt-spk can be one of TEF1, TEF2, TEM1, TEM2
+    printf "TEF1\nTEF2\nTEM1\nTEM2\n" | grep --line-regexp -q '{{tgt-spk}}'
+
     # train
     python3 run_downstream.py \
     -m train -d a2o-vc-vcc2020 -u fbank \
-    -p {{exp-dir}}/{{experiment-name}}/vc \
+    -p {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}} \
     -o \
-    config.downstream_expert.trgspk=TEF1,,\
+    config.downstream_expert.trgspk={{tgt-spk}},,\
     config.downstream_expert.datarc.data_root={{data-dir}}/vcc2020/data,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    # TODO VC test
-    echo 'to be implemented'
+    ./downstream/a2o-vc-vcc2020/decode.sh {{data-dir}}/vcc2020/models/pwg_task1 {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}} {{tgt-spk}} {{data-dir}}/vcc2020/data
 
 source-separation experiment-name learning-rate=lr:
     # train

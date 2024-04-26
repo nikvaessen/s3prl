@@ -10,6 +10,7 @@
 import argparse
 import multiprocessing as mp
 import os
+import pathlib
 
 import numpy as np
 import librosa
@@ -116,12 +117,14 @@ def get_parser():
 def main():
     args = get_parser().parse_args()
 
+    script_dir = pathlib.Path(__file__).resolve().parent
+
     trgspk = args.trgspk
     task = "task1" if trgspk[1] == "E" else "task2"
-    gt_root = os.path.join(args.data_root, "vcc2020")
-    f0_path = os.path.join(args.data_root, "f0.yaml")
-    threshold_path = os.path.join(args.data_root, "thresholds.yaml")
-    transcription_path = os.path.join(args.data_root, "vcc2020", "prompts", "Eng_transcriptions.txt")
+    gt_root = os.path.join(args.data_root)
+    f0_path = os.path.join(str(script_dir), 'data', "f0.yaml")
+    threshold_path = os.path.join(str(script_dir), 'data', "thresholds.yaml")
+    transcription_path = os.path.join(args.data_root, "prompts", "Eng_transcriptions.txt")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
     # load f0min and f0 max

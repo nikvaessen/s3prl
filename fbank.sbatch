@@ -4,7 +4,7 @@
 #SBATCH --error=fbank_%A_%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-#SBATCH --array=0-21
+#SBATCH --array=0-24
 
 #SBATCH --partition=das
 #SBATCH --account=das
@@ -26,7 +26,6 @@ NAME="$1"
 
 # activate virtual environment
 source .venv/bin/activate
-
 
 case $SLURM_ARRAY_TASK_ID in
     0)
@@ -87,12 +86,21 @@ case $SLURM_ARRAY_TASK_ID in
         just --unstable downstream::speech-translation "$NAME"
         ;;
     19)
-        just --unstable downstream::voice-conversion "$NAME"
+        just --unstable downstream::voice-conversion "$NAME" TEM1
         ;;
     20)
-        just --unstable downstream::source-separation "$NAME"
+        just --unstable downstream::voice-conversion "$NAME" TEM2
         ;;
     21)
+        just --unstable downstream::voice-conversion "$NAME" TEF1
+        ;;
+    22)
+        just --unstable downstream::voice-conversion "$NAME"  TEF2
+        ;;
+    23)
+        just --unstable downstream::source-separation "$NAME"
+        ;;
+    24)
         just --unstable downstream::speech-enhancement "$NAME"
         ;;
     *)
