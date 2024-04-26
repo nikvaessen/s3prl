@@ -169,7 +169,7 @@ class DownstreamExpert(nn.Module):
             shuffle=True,
             num_workers=self.loaderrc["num_workers"],
             drop_last=False,
-            pin_memory=True,
+            pin_memory=False,
             collate_fn=dataset.collate_fn,
         )
 
@@ -180,7 +180,7 @@ class DownstreamExpert(nn.Module):
             shuffle=False,
             num_workers=self.loaderrc["num_workers"],
             drop_last=False,
-            pin_memory=True,
+            pin_memory=False,
             collate_fn=dataset.collate_fn,
         )
 
