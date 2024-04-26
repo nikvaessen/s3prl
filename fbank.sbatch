@@ -4,7 +4,7 @@
 #SBATCH --error=fbank_%A_%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-#SBATCH --array=0-17
+#SBATCH --array=0-21
 
 #SBATCH --partition=das
 #SBATCH --account=das
@@ -63,24 +63,36 @@ case $SLURM_ARRAY_TASK_ID in
         just --unstable downstream::speaker-diarization "$NAME"
         ;;
     11)
-        just --unstable downstream::emotion-recognition "$NAME"
+        just --unstable downstream::emotion-recognition "$NAME" fold1
         ;;
     12)
-        just --unstable downstream::intent-classification "$NAME"
+        just --unstable downstream::emotion-recognition "$NAME" fold2
         ;;
     13)
-        just --unstable downstream::slot-filling "$NAME"
+        just --unstable downstream::emotion-recognition "$NAME" fold3
         ;;
     14)
-        just --unstable downstream::speech-translation "$NAME"
+        just --unstable downstream::emotion-recognition "$NAME" fold4
         ;;
     15)
-        just --unstable downstream::voice-conversion "$NAME"
+        just --unstable downstream::emotion-recognition "$NAME" fold5
         ;;
     16)
-        just --unstable downstream::source-separation "$NAME"
+        just --unstable downstream::intent-classification "$NAME"
         ;;
     17)
+        just --unstable downstream::slot-filling "$NAME"
+        ;;
+    18)
+        just --unstable downstream::speech-translation "$NAME"
+        ;;
+    19)
+        just --unstable downstream::voice-conversion "$NAME"
+        ;;
+    20)
+        just --unstable downstream::source-separation "$NAME"
+        ;;
+    21)
         just --unstable downstream::speech-enhancement "$NAME"
         ;;
     *)

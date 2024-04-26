@@ -22,6 +22,7 @@ phoneme-recognition experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/pr/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/pr/superb.pr.txt
+    cat {{exp-dir}}/{{experiment-name}}/pr/superb.pr.txt
 
 speech-recognition experiment-name learning-rate=lr:
     # train
@@ -36,6 +37,7 @@ speech-recognition experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -t "test-clean" -e {{exp-dir}}/{{experiment-name}}/asr/dev-clean-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
+    cat {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
 
 ood-asr-cv experiment-name lang learning-rate=lr:
     # train
@@ -53,6 +55,7 @@ ood-asr-cv experiment-name lang learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}}/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.{{lang}}.ood-asr.txt
+    cat {{exp-dir}}/{{experiment-name}}/asr-ood/superb.{{lang}}.ood-asr.txt
 
 ood-asr-SBCSAE experiment-name learning-rate=lr:
     # train
@@ -70,6 +73,7 @@ ood-asr-SBCSAE experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.sbcsae.ood-asr.txt
+    cat {{exp-dir}}/{{experiment-name}}/asr-ood/superb.sbcsae.ood-asr.txt
 
 keyword-spotting experiment-name learning-rate=lr:
     # train
@@ -84,6 +88,7 @@ keyword-spotting experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ks/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ks/superb.ks.txt
+    cat {{exp-dir}}/{{experiment-name}}/ks/superb.ks.txt
 
 query-by-example-spoken-term-detection experiment-name num-layers=default-num-layers:
     #!/usr/bin/env bash
@@ -134,6 +139,7 @@ speaker-identificaton experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
+    cat {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
 
 speaker-verification experiment-name learning-rate=lr:
     # train
@@ -166,21 +172,21 @@ speaker-diarization experiment-name learning-rate=lr:
     # score
     ./downstream/diarization/score.sh {{exp-dir}}/{{experiment-name}}/sd {{data-dir}}/librimix-sd/test
 
-emotion-recognition experiment-name learning-rate=lr:
+emotion-recognition experiment-name fold learning-rate=lr:
     #!/usr/bin/env bash
-    # TODO cross validation
     python3 run_downstream.py \
     -m train -u fbank -d emotion \
-    -p {{exp-dir}}/{{experiment-name}}/er \
+    -p {{exp-dir}}/{{experiment-name}}/er/{{fold}} \
     -c downstream/emotion/config.yaml \
     -o \
-    config.downstream_expert.datarc.test_fold='fold1',,\
+    config.downstream_expert.datarc.test_fold={{fold}},,\
     config.downstream_expert.datarc.root={{data-dir}}/iemocap,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/er/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/er/superb.er.txt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/er/{{fold}}/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/er/{{fold}}/superb.er.txt
+    cat {{exp-dir}}/{{experiment-name}}/er/{{fold}}/superb.er.txt
 
 intent-classification experiment-name learning-rate=lr:
     python3 run_downstream.py \
@@ -193,6 +199,7 @@ intent-classification experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ic/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ic/superb.ic.txt
+    cat {{exp-dir}}/{{experiment-name}}/ic/superb.ic.txt
 
 slot-filling experiment-name learning-rate=lr:
     python3 run_downstream.py \
@@ -207,6 +214,7 @@ slot-filling experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sf/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sf/superb.sf.txt
+    cat {{exp-dir}}/{{experiment-name}}/sf/superb.sf.txt
 
 speech-translation experiment-name learning-rate=lr:
     python3 run_downstream.py \
@@ -218,6 +226,7 @@ speech-translation experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
+    cat {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
 
 voice-conversion experiment-name learning-rate=lr:
     # train
@@ -246,6 +255,7 @@ source-separation experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
+    cat {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
 
 speech-enhancement experiment-name learning-rate=lr:
     # train
@@ -259,4 +269,4 @@ speech-enhancement experiment-name learning-rate=lr:
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
-
+    cat {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
