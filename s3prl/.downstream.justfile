@@ -44,10 +44,10 @@ ood-asr-cv experiment-name lang learning-rate=lr:
     -p {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}} \
     -c downstream/ctc/cv_config/cv_{{lang}}.yaml \
     -o \
-    config.downstream_expert.corpus.path={{data-dir}}/common-voice/cv-corpus-7.0-2021-07-21/{{lang}}/clips,,\
-    config.downstream_expert.corpus.train=[\"{{data-dir}}/common-voice/{{lang}}/train.tsv\"],,\
-    config.downstream_expert.corpus.test=[\"{{data-dir}}/common-voice/{{lang}}/dev.tsv\"],,\
-    config.downstream_expert.corpus.dev=[\"{{data-dir}}/common-voice/{{lang}}/test.tsv\"],,\
+    config.downstream_expert.corpus.path={{data-dir}}/cv-v7-ood/cv-corpus-7.0-2021-07-21/{{lang}}/clips,,\
+    config.downstream_expert.corpus.train=[\"{{data-dir}}/cv-v7-ood/{{lang}}/train.tsv\"],,\
+    config.downstream_expert.corpus.test=[\"{{data-dir}}/cv-v7-ood/{{lang}}/dev.tsv\"],,\
+    config.downstream_expert.corpus.dev=[\"{{data-dir}}/cv-v7-ood/{{lang}}/test.tsv\"],,\
     config.downstream_expert.corpus.num_workers={{num-workers}},,\
     config.optimizer.lr={{learning-rate}}
 
@@ -130,7 +130,7 @@ speaker-identificaton experiment-name learning-rate=lr:
     -o \
     config.downstream_expert.datarc.file_path={{data-dir}}/vc1,,\
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
-    config.optimizer.lr={{learning-rate}},,
+    config.optimizer.lr={{learning-rate}}
 
     # test
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
