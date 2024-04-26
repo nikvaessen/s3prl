@@ -25,7 +25,9 @@ fi
 NAME="$1"
 
 # activate virtual environment
+source "$HOME"/.bashrc
 activate
+
 
 case $SLURM_ARRAY_TASK_ID in
     0)
