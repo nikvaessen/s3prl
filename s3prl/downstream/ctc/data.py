@@ -73,8 +73,12 @@ def create_dataset(split, tokenizer, name, bucketing, batch_size, **kwargs):
 
 def load_dataset(split, tokenizer, corpus):
     ''' Prepare dataloader for training/validation'''
-    num_workers = corpus.pop('num_workers', 12)
-    dataset, loader_bs = create_dataset(split, tokenizer, num_workers=num_workers, **corpus)
+    if 'num_workers' not in corpus:
+        corpus['num_workers'] = 12
+
+    num_workers = corpus.get('num_workers')
+
+    dataset, loader_bs = create_dataset(split, tokenizer, **corpus)
     collate_fn = partial(collect_audio_batch, split=split)
     if split == 'train':
         sampler = DistributedSampler(dataset) if is_initialized() else None
