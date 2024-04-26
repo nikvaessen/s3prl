@@ -17,7 +17,7 @@
 
 # check cmd arguments are given
 if [ -z "$1" ]; then
-    echo 'please provide $NAME in $1'
+    echo 'please provide "$NAME" in $1'
     exit 1
 fi
 
@@ -25,64 +25,63 @@ fi
 NAME="$1"
 
 # activate virtual environment
-source "$HOME"/.bashrc
-activate
+source .venv/bin/activate
 
 
 case $SLURM_ARRAY_TASK_ID in
     0)
-        just downstream::phoneme-recognition $NAME
+        just --unstable downstream::phoneme-recognition "$NAME"
         ;;
     1)
-        just downstream::speech-recognition $NAME
+        just --unstable downstream::speech-recognition "$NAME"
         ;;
     2)
-        just downstream::ood-asr-cv $NAME es
+        just --unstable downstream::ood-asr-cv "$NAME" es
         ;;
     3)
-        just downstream::ood-asr-cv $NAME ar
+        just --unstable downstream::ood-asr-cv "$NAME" ar
         ;;
     4)
-        just downstream::ood-asr-cv $NAME zh
+        just --unstable downstream::ood-asr-cv "$NAME" zh
         ;;
     5)
-        just downstream::ood-asr-SBCSAE $NAME
+        just --unstable downstream::ood-asr-SBCSAE "$NAME"
         ;;
     6)
-        just downstream::keyword-spotting $NAME
+        just --unstable downstream::keyword-spotting "$NAME"
         ;;
     7)
-        just downstream::query-by-example-spoken-term-detection $NAME 1
+        just --unstable downstream::query-by-example-spoken-term-detection "$NAME" 1
         ;;
     8)
-        just downstream::speaker-identificaton $NAME
+        just --unstable downstream::speaker-identificaton "$NAME"
         ;;
     9)
-        just downstream::speaker-verification $NAME
+        just --unstable downstream::speaker-verification "$NAME"
         ;;
     10)
-        just downstream::speaker-diarization $NAME
+        just --unstable downstream::speaker-diarization "$NAME"
         ;;
     11)
-        just downstream::emotion-recognition $NAME
+        just --unstable downstream::emotion-recognition "$NAME"
         ;;
     12)
-        just downstream::intent-classification $NAME
+        just --unstable downstream::intent-classification "$NAME"
         ;;
     13)
-        just downstream::slot-filling $NAME
+        just --unstable downstream::slot-filling "$NAME"
         ;;
     14)
-        just downstream::speech-translation $NAME
+        just --unstable downstream::speech-translation "$NAME"
         ;;
     15)
-        just downstream::voice-conversion $NAME
+        just --unstable downstream::voice-conversion "$NAME"
         ;;
     16)
-        just downstream::source-separation $NAME
+        just --unstable downstream::source-separation "$NAME"
         ;;
     17)
-        just downstream::speech-enhancement $NAME
+        just --unstable downstream::speech-enhancement "$NAME"
         ;;
     *)
         echo "No command specified for task ID $SLURM_ARRAY_TASK_ID"
