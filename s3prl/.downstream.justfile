@@ -132,6 +132,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
         -o \
         "config.downstream_expert.dtwrc.dist_method=cosine,,\
         config.downstream_expert.max_workers={{num-workers}},,\
+        config.downstream_expert.datarc.num_workers={{num-workers}},,\
         config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
     done
 
@@ -143,7 +144,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
         cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev/superb.qbe.txt
 
         # test
-        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10 {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10 > {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
         cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
      done
 
