@@ -6,12 +6,16 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 
 # common settings
 num-workers := "$(($(nproc)-1))"
-lr := "1e-5"
 default-num-layers := "12"
 fp16 := 'True'
 path := '/dev/null'
 
-phoneme-recognition experiment-name upstream upstream-path=path learning-rate=lr:
+# default LR values
+lr2 := "1e-2"
+lr3 := "1e-3"
+lr4 := "1e-4"
+
+phoneme-recognition experiment-name upstream upstream-path=path learning-rate=lr2:
     # train
     python3 run_downstream.py \
     -d ctc -a \
@@ -28,7 +32,7 @@ phoneme-recognition experiment-name upstream upstream-path=path learning-rate=lr
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/pr/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/pr/superb.pr.txt
     cat {{exp-dir}}/{{experiment-name}}/pr/superb.pr.txt
 
-speech-recognition experiment-name upstream upstream-path=path learning-rate=lr:
+speech-recognition experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d asr -a \
@@ -45,7 +49,7 @@ speech-recognition experiment-name upstream upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -t "test-clean" -e {{exp-dir}}/{{experiment-name}}/asr/dev-clean-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
     cat {{exp-dir}}/{{experiment-name}}/asr/superb.asr.txt
 
-ood-asr-cv experiment-name upstream lang upstream-path=path learning-rate=lr:
+ood-asr-cv experiment-name upstream lang upstream-path=path learning-rate=lr4:
     # lang can be one of es, ar, zh-CN
     printf "es\nar\nzh-CN\n" | grep --line-regexp -q '{{lang}}'
 
@@ -68,7 +72,7 @@ ood-asr-cv experiment-name upstream lang upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/{{lang}}/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.{{lang}}.ood-asr.txt
     cat {{exp-dir}}/{{experiment-name}}/asr-ood/superb.{{lang}}.ood-asr.txt
 
-ood-asr-SBCSAE experiment-name upstream upstream-path=path learning-rate=lr:
+ood-asr-SBCSAE experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d ctc -a \
@@ -88,7 +92,7 @@ ood-asr-SBCSAE experiment-name upstream upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/asr-ood/SBCSAE/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/asr-ood/superb.sbcsae.ood-asr.txt
     cat {{exp-dir}}/{{experiment-name}}/asr-ood/superb.sbcsae.ood-asr.txt
 
-keyword-spotting experiment-name upstream upstream-path=path learning-rate=lr:
+keyword-spotting experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d speech_commands -a \
@@ -146,7 +150,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
         ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10
      done
 
-speaker-identificaton experiment-name upstream upstream-path=path learning-rate=lr:
+speaker-identificaton experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d voxceleb1 -a \
@@ -162,7 +166,7 @@ speaker-identificaton experiment-name upstream upstream-path=path learning-rate=
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sid/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
     cat {{exp-dir}}/{{experiment-name}}/sid/superb.sid.txt
 
-speaker-verification experiment-name upstream upstream-path=path learning-rate=lr:
+speaker-verification experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d sv_voxceleb1 -a \
@@ -178,7 +182,7 @@ speaker-verification experiment-name upstream upstream-path=path learning-rate=l
     ./downstream/sv_voxceleb1/test_expdir.sh {{exp-dir}}/{{experiment-name}}/asv {{data-dir}}/vc1 > {{exp-dir}}/{{experiment-name}}/asv/superb.asv.txt
     cat {{exp-dir}}/{{experiment-name}}/asv/superb.asv.txt
 
-speaker-diarization experiment-name upstream upstream-path=path learning-rate=lr:
+speaker-diarization experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d diarization -a \
@@ -199,7 +203,7 @@ speaker-diarization experiment-name upstream upstream-path=path learning-rate=lr
     ./downstream/diarization/score.sh {{exp-dir}}/{{experiment-name}}/sd {{data-dir}}/librimix-sd/test > {{exp-dir}}/{{experiment-name}}/sd/superb.sd.txt
     cat {{exp-dir}}/{{experiment-name}}/sd/superb.sd.txt
 
-emotion-recognition experiment-name upstream fold upstream-path=path learning-rate=lr:
+emotion-recognition experiment-name upstream fold upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash
     python3 run_downstream.py \
     -d emotion -a \
@@ -217,7 +221,7 @@ emotion-recognition experiment-name upstream fold upstream-path=path learning-ra
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/er/{{fold}}/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/er/{{fold}}/superb.er.txt
     cat {{exp-dir}}/{{experiment-name}}/er/{{fold}}/superb.er.txt
 
-intent-classification experiment-name upstream upstream-path=path learning-rate=lr:
+intent-classification experiment-name upstream upstream-path=path learning-rate=lr4:
     python3 run_downstream.py \
     -d fluent_commands -a \
     -m train -u {{upstream}} -k {{upstream-path}} \
@@ -232,7 +236,7 @@ intent-classification experiment-name upstream upstream-path=path learning-rate=
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ic/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ic/superb.ic.txt
     cat {{exp-dir}}/{{experiment-name}}/ic/superb.ic.txt
 
-slot-filling experiment-name upstream upstream-path=path learning-rate=lr:
+slot-filling experiment-name upstream upstream-path=path learning-rate=lr4:
     python3 run_downstream.py \
     -d ctc -a \
     -m train -u {{upstream}} -k {{upstream-path}} \
@@ -249,7 +253,7 @@ slot-filling experiment-name upstream upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/sf/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/sf/superb.sf.txt
     cat {{exp-dir}}/{{experiment-name}}/sf/superb.sf.txt
 
-speech-translation experiment-name upstream upstream-path=path learning-rate=lr:
+speech-translation experiment-name upstream upstream-path=path learning-rate=lr3:
     python3 run_downstream.py \
     -d speech_translation -a \
     -m train -u {{upstream}} -k {{upstream-path}} \
@@ -263,7 +267,7 @@ speech-translation experiment-name upstream upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/st/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
     cat {{exp-dir}}/{{experiment-name}}/st/superb.st.txt
 
-voice-conversion experiment-name upstream tgt-spk upstream-path=path learning-rate=lr:
+voice-conversion experiment-name upstream tgt-spk upstream-path=path learning-rate=lr4:
     # tgt-spk can be one of TEF1, TEF2, TEM1, TEM2
     printf "TEF1\nTEF2\nTEM1\nTEM2\n" | grep --line-regexp -q '{{tgt-spk}}'
 
@@ -287,7 +291,7 @@ voice-conversion experiment-name upstream tgt-spk upstream-path=path learning-ra
 
     cat {{exp-dir}}/{{experiment-name}}/vc/{{tgt-spk}}/superb.vc.{{tgt-spk}}.txt
 
-source-separation experiment-name upstream upstream-path=path learning-rate=lr:
+source-separation experiment-name upstream upstream-path=path learning-rate=lr3:
     # train
     python3 run_downstream.py \
     -d separation_stft2 -a \
@@ -303,7 +307,7 @@ source-separation experiment-name upstream upstream-path=path learning-rate=lr:
     python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
     cat {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
 
-speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr:
+speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr4:
     # train
     python3 run_downstream.py \
     -d enhancement_stft -a \

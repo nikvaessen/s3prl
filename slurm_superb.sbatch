@@ -41,7 +41,7 @@ UPSTREAM_PATH="$4"
 
 # default LR if not given
 if [ -z "$5" ]; then
-    LR=1e-5
+    LR=''
 else
     LR=$5
 fi
