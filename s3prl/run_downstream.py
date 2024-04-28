@@ -153,9 +153,9 @@ def get_downstream_args():
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    torch.multiprocessing.set_sharing_strategy('file_system')
-    torchaudio.set_audio_backend('sox_io')
-    hack_isinstance()
+    # torch.multiprocessing.set_sharing_strategy('file_system')
+    # torchaudio.set_audio_backend('sox_io')
+    # hack_isinstance()
 
     # get config and arguments
     args, config, backup_files = get_downstream_args()

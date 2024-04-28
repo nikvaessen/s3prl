@@ -140,12 +140,10 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     cd {{data-dir}}/quesst14/scoring/
     for layer in $(seq 1 {{num-layers}}); do
         # dev
-        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev groundtruth_quesst14_dev -10 > {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev/superb.qbe.txt
-        cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev/superb.qbe.txt
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev groundtruth_quesst14_dev -10
 
         # test
-        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10 > {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
-        cat {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test/superb.qbe.txt
+        ./score-TWV-Cnxe.sh {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test groundtruth_quesst14_eval -10
      done
 
 speaker-identificaton experiment-name upstream upstream-path=path learning-rate=lr:
