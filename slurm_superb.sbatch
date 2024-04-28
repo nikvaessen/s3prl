@@ -41,8 +41,6 @@ UPSTREAM_PATH="$4"
 
 # default LR if not given
 if [ -z "$5" ]; then
-    LR=''
-else
     LR=$5
 fi
 
@@ -51,79 +49,175 @@ source .venv/bin/activate
 
 case $SLURM_ARRAY_TASK_ID in
     0)
-        just --unstable downstream::phoneme-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::phoneme-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::phoneme-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     1)
-        just --unstable downstream::speech-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speech-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speech-recognition "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     2)
-        just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" es "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" es "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" es "$UPSTREAM_PATH"
+        fi
         ;;
     3)
-        just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" ar "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" ar "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" ar "$UPSTREAM_PATH"
+        fi
         ;;
     4)
-        just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" zh-CN "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" zh-CN "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::ood-asr-cv "$NAME" "$UPSTREAM" zh-CN "$UPSTREAM_PATH"
+        fi
         ;;
     5)
-        just --unstable downstream::ood-asr-SBCSAE "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::ood-asr-SBCSAE "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::ood-asr-SBCSAE "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     6)
-        just --unstable downstream::keyword-spotting "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::keyword-spotting "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::keyword-spotting "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     7)
         just --unstable downstream::query-by-example-spoken-term-detection "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$NUM_LAYERS"
         ;;
     8)
-        just --unstable downstream::speaker-identificaton "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speaker-identificaton "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speaker-identificaton "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     9)
-        just --unstable downstream::speaker-verification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speaker-verification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speaker-verification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     10)
-        just --unstable downstream::speaker-diarization "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speaker-diarization "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speaker-diarization "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     11)
-        just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold1 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold1 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold1 "$UPSTREAM_PATH"
+        fi
         ;;
     12)
-        just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold2 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold2 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold2 "$UPSTREAM_PATH"
+        fi
         ;;
     13)
-        just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold3 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold3 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold3 "$UPSTREAM_PATH"
+        fi
         ;;
     14)
-        just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold4 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold4 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold4 "$UPSTREAM_PATH"
+        fi
         ;;
     15)
-        just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold5 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold5 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::emotion-recognition "$NAME" "$UPSTREAM" fold5 "$UPSTREAM_PATH"
+        fi
         ;;
     16)
-        just --unstable downstream::intent-classification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::intent-classification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::intent-classification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     17)
-        just --unstable downstream::slot-filling "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::slot-filling "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::slot-filling "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     18)
-        just --unstable downstream::speech-translation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speech-translation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speech-translation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     19)
-        just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM1 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM1 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM1 "$UPSTREAM_PATH"
+        fi
         ;;
     20)
-        just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM2 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM2 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEM2 "$UPSTREAM_PATH"
+        fi
         ;;
     21)
-        just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF1 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF1 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF1 "$UPSTREAM_PATH"
+        fi
         ;;
     22)
-        just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF2 "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF2 "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::voice-conversion "$NAME" "$UPSTREAM" TEF2 "$UPSTREAM_PATH"
+        fi
         ;;
     23)
-        just --unstable downstream::source-separation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::source-separation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::source-separation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     24)
-        just --unstable downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        if [ -n "$LR" ]; then
+            just --unstable downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
+        else
+            just --unstable downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
+        fi
         ;;
     *)
         echo "No command specified for task ID $SLURM_ARRAY_TASK_ID"
