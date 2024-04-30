@@ -115,11 +115,11 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     for layer in $(seq 1 {{num-layers}}); do
         echo "layer: $layer with {{num-workers}} workers"
         # dev
-        # -u hubert -l ${layer} \
         python3 run_downstream.py \
         -d quesst14_dtw \
         -m evaluate -u {{upstream}} -k {{upstream-path}} \
         -t "dev" \
+        -l ${layer} \
         -p {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_dev \
         -o \
         "config.downstream_expert.dtwrc.dist_method=cosine,,\
@@ -132,6 +132,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
         -d quesst14_dtw \
         -m evaluate -u {{upstream}} -k {{upstream-path}} \
         -t "test" \
+        -l ${layer} \
         -p {{exp-dir}}/{{experiment-name}}/qbe/exp_${layer}_test \
         -o \
         "config.downstream_expert.dtwrc.dist_method=cosine,,\
