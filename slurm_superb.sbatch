@@ -8,12 +8,13 @@
 
 #SBATCH --partition=das
 #SBATCH --account=das
-#SBATCH --qos=das-preempt
+#SBATCH --qos=das-large
+#SBATCH --exclude=cn104
 
-#SBATCH --mem=20G
-#SBATCH --cpus-per-task=6
+#SBATCH --mem=60G
+#SBATCH --cpus-per-task=16
 #SBATCH --gres=gpu:1
-#SBATCH --time=72:00:00
+#SBATCH --time=48:00:00
 
 # check cmd arguments are given
 if [ -z "$1" ]; then
