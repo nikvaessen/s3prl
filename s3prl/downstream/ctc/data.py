@@ -83,8 +83,8 @@ def load_dataset(split, tokenizer, corpus):
     if split == 'train':
         sampler = DistributedSampler(dataset) if is_initialized() else None
         dataloader = DataLoader(dataset, batch_size=loader_bs, shuffle=(sampler is None),
-                                sampler=sampler, collate_fn=collate_fn, num_workers=num_workers)
+                                sampler=sampler, collate_fn=collate_fn, num_workers=num_workers, persistent_workers=True)
     else:
         dataloader = DataLoader(dataset, batch_size=loader_bs, shuffle=False,
-                                collate_fn=collate_fn, num_workers=num_workers)
+                                collate_fn=collate_fn, num_workers=num_workers, persistent_workers=True)
     return dataloader
