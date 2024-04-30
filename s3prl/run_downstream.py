@@ -1,4 +1,6 @@
 import os
+import time
+
 import yaml
 import glob
 import torch
@@ -156,6 +158,7 @@ def main():
     # torch.multiprocessing.set_sharing_strategy('file_system')
     # torchaudio.set_audio_backend('sox_io')
     # hack_isinstance()
+    time.sleep(random.randint(1, 60))
     torch.multiprocessing.set_start_method('spawn')
     torch.set_num_threads(1)
 
