@@ -12,7 +12,7 @@
 #SBATCH --exclude=cn104
 
 #SBATCH --mem=39
-#SBATCH --cpus-per-task=9
+#SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:1
 #SBATCH --time=48:00:00
 
