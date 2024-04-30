@@ -149,14 +149,16 @@ class DownstreamExpert(nn.Module):
             shuffle=(sampler is None),
             sampler=sampler,
             num_workers=self.datarc['num_workers'],
-            collate_fn=dataset.collate_fn
+            collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     def _get_eval_dataloader(self, dataset):
         return DataLoader(
             dataset, batch_size=self.datarc['eval_batch_size'],
             shuffle=False, num_workers=self.datarc['num_workers'],
-            collate_fn=dataset.collate_fn
+            collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     # Interface

@@ -37,6 +37,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 COMPUTE_METRICS = ["si_sdr", "stoi", "pesq"]
 
+
 def match_length(feat_list, length_list):
     assert len(feat_list) == len(length_list)
     bs = len(length_list)
@@ -46,25 +47,32 @@ def match_length(feat_list, length_list):
         if feat_list[i].size(0) == length_list[i]:
             new_feat_list.append(feat_list[i])
         elif feat_list[i].size(0) > length_list[i]:
-            new_feat_list.append(feat_list[i][:length_list[i], :])
+            new_feat_list.append(feat_list[i][: length_list[i], :])
         else:
-            new_feat = torch.zeros(length_list[i], feat_list[i].size(1)).to(feat_list[i].device)
-            new_feat[:feat_list[i].size(0), :] = feat_list[i]
+            new_feat = torch.zeros(length_list[i], feat_list[i].size(1)).to(
+                feat_list[i].device
+            )
+            new_feat[: feat_list[i].size(0), :] = feat_list[i]
             new_feat_list.append(new_feat)
     return new_feat_list
+
 
 # We cannot guarantee the predicted STFT feature is always valid.
 # In our experiments, we often observe impulse at the end of signal.
 # This function is used to suppress the impluse.
 def postprocess(x, pad_zeros=True):
     y = np.copy(x)
-    p = int(np.max(np.nonzero(y))) + 1 # y[p:] = 0
+    p = int(np.max(np.nonzero(y))) + 1  # y[p:] = 0
     if p < x.shape[0] - 2048:
-        print("Warning: the predicted signal is 0 from sample {} to {}".format(p, x.shape[0]))
+        print(
+            "Warning: the predicted signal is 0 from sample {} to {}".format(
+                p, x.shape[0]
+            )
+        )
         return x
     window_size = 512
     start_p = p - window_size
-    if start_p <= 0: # the wav length too short
+    if start_p <= 0:  # the wav length too short
         print("Warning: the length of wav is too short")
         return x
     else:
@@ -77,11 +85,22 @@ def postprocess(x, pad_zeros=True):
             z = np.copy(x)
             if pad_zeros:
                 z[invalid_pos:] = 0
-                print("Set from {} to {} 0, {} samples".format(invalid_pos, x.shape[0], x.shape[0] - invalid_pos))
+                print(
+                    "Set from {} to {} 0, {} samples".format(
+                        invalid_pos, x.shape[0], x.shape[0] - invalid_pos
+                    )
+                )
             else:
-                z[invalid_pos:] = np.random.normal(loc=0.0, scale=0.01, size=(x.shape[0] - invalid_pos,))
-                print("Set from {} to {} Gaussian noise, {} samples".format(invalid_pos, x.shape[0], x.shape[0] - invalid_pos))
+                z[invalid_pos:] = np.random.normal(
+                    loc=0.0, scale=0.01, size=(x.shape[0] - invalid_pos,)
+                )
+                print(
+                    "Set from {} to {} Gaussian noise, {} samples".format(
+                        invalid_pos, x.shape[0], x.shape[0] - invalid_pos
+                    )
+                )
             return z
+
 
 class DownstreamExpert(nn.Module):
     """
@@ -89,7 +108,9 @@ class DownstreamExpert(nn.Module):
     eg. downstream forward, metric computation, contents to log
     """
 
-    def __init__(self, upstream_dim, upstream_rate, downstream_expert, expdir, **kwargs):
+    def __init__(
+        self, upstream_dim, upstream_rate, downstream_expert, expdir, **kwargs
+    ):
         super(DownstreamExpert, self).__init__()
         self.upstream_dim = upstream_dim
         self.upstream_rate = upstream_rate
@@ -99,67 +120,71 @@ class DownstreamExpert(nn.Module):
         self.expdir = expdir
 
         self.train_dataset = SeparationDataset(
-                data_dir=self.loaderrc["train_dir"],
-                rate=self.datarc['rate'],
-                src=self.datarc['src'],
-                tgt=self.datarc['tgt'],
-                n_fft=self.datarc['n_fft'],
-                hop_length=self.upstream_rate,
-                win_length=self.datarc['win_length'],
-                window=self.datarc['window'],
-                center=self.datarc['center'],
-            )
+            data_dir=self.loaderrc["train_dir"],
+            rate=self.datarc["rate"],
+            src=self.datarc["src"],
+            tgt=self.datarc["tgt"],
+            n_fft=self.datarc["n_fft"],
+            hop_length=self.upstream_rate,
+            win_length=self.datarc["win_length"],
+            window=self.datarc["window"],
+            center=self.datarc["center"],
+        )
         self.dev_dataset = SeparationDataset(
-                data_dir=self.loaderrc["dev_dir"],
-                rate=self.datarc['rate'],
-                src=self.datarc['src'],
-                tgt=self.datarc['tgt'],
-                n_fft=self.datarc['n_fft'],
-                hop_length=self.upstream_rate,
-                win_length=self.datarc['win_length'],
-                window=self.datarc['window'],
-                center=self.datarc['center'],
+            data_dir=self.loaderrc["dev_dir"],
+            rate=self.datarc["rate"],
+            src=self.datarc["src"],
+            tgt=self.datarc["tgt"],
+            n_fft=self.datarc["n_fft"],
+            hop_length=self.upstream_rate,
+            win_length=self.datarc["win_length"],
+            window=self.datarc["window"],
+            center=self.datarc["center"],
         )
         self.test_dataset = SeparationDataset(
-                data_dir=self.loaderrc["test_dir"],
-                rate=self.datarc['rate'],
-                src=self.datarc['src'],
-                tgt=self.datarc['tgt'],
-                n_fft=self.datarc['n_fft'],
-                hop_length=self.upstream_rate,
-                win_length=self.datarc['win_length'],
-                window=self.datarc['window'],
-                center=self.datarc['center'],
+            data_dir=self.loaderrc["test_dir"],
+            rate=self.datarc["rate"],
+            src=self.datarc["src"],
+            tgt=self.datarc["tgt"],
+            n_fft=self.datarc["n_fft"],
+            hop_length=self.upstream_rate,
+            win_length=self.datarc["win_length"],
+            window=self.datarc["window"],
+            center=self.datarc["center"],
         )
 
         if self.modelrc["model"] == "SepRNN":
             self.model = SepRNN(
                 input_dim=self.upstream_dim,
-                num_bins=int(self.datarc['n_fft'] / 2 + 1),
+                num_bins=int(self.datarc["n_fft"] / 2 + 1),
                 rnn=self.modelrc["rnn"],
-                num_spks=self.datarc['num_speakers'],
+                num_spks=self.datarc["num_speakers"],
                 num_layers=self.modelrc["rnn_layers"],
                 hidden_size=self.modelrc["hidden_size"],
                 dropout=self.modelrc["dropout"],
                 non_linear=self.modelrc["non_linear"],
-                bidirectional=self.modelrc["bidirectional"]
+                bidirectional=self.modelrc["bidirectional"],
             )
         else:
             raise ValueError("Model type not defined.")
 
         self.loss_type = self.modelrc["loss_type"]
         if self.modelrc["loss_type"] == "MSE":
-            self.objective = MSELoss(self.datarc['num_speakers'], self.modelrc["mask_type"])
+            self.objective = MSELoss(
+                self.datarc["num_speakers"], self.modelrc["mask_type"]
+            )
         elif self.modelrc["loss_type"] == "SISDR":
-            self.objective = SISDRLoss(self.datarc['num_speakers'], 
-                    n_fft=self.datarc['n_fft'], 
-                    hop_length=self.upstream_rate,
-                    win_length=self.datarc['win_length'], 
-                    window=self.datarc['window'], 
-                    center=self.datarc['center'])
+            self.objective = SISDRLoss(
+                self.datarc["num_speakers"],
+                n_fft=self.datarc["n_fft"],
+                hop_length=self.upstream_rate,
+                win_length=self.datarc["win_length"],
+                window=self.datarc["window"],
+                center=self.datarc["center"],
+            )
         else:
             raise ValueError("Loss type not defined.")
-        
+
         self.register_buffer("best_score", torch.ones(1) * -10000)
 
     def _get_train_dataloader(self, dataset):
@@ -171,6 +196,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=False,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def _get_eval_dataloader(self, dataset):
@@ -182,6 +208,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=False,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def get_dataloader(self, mode):
@@ -205,7 +232,20 @@ class DownstreamExpert(nn.Module):
         elif mode == "test":
             return self._get_eval_dataloader(self.test_dataset)
 
-    def forward(self, mode, features, uttname_list, source_attr, source_wav, target_attr, target_wav_list, feat_length, wav_length, records, **kwargs):
+    def forward(
+        self,
+        mode,
+        features,
+        uttname_list,
+        source_attr,
+        source_wav,
+        target_attr,
+        target_wav_list,
+        feat_length,
+        wav_length,
+        records,
+        **kwargs,
+    ):
         """
         Args:
             mode: string
@@ -220,7 +260,7 @@ class DownstreamExpert(nn.Module):
                 list of utterance names
 
             source_attr:
-                source_attr is a dict containing the STFT information 
+                source_attr is a dict containing the STFT information
                 for the mixture. source_attr['magnitude'] stores the STFT
                 magnitude, source_attr['phase'] stores the STFT phase and
                 source_attr['stft'] stores the raw STFT feature. The shape
@@ -256,25 +296,36 @@ class DownstreamExpert(nn.Module):
             loss:
                 the loss to be optimized, should not be detached
         """
-        
+
         # match the feature length to STFT feature length
         features = match_length(features, feat_length)
         features = pack_sequence(features)
         mask_list = self.model(features)
 
         # evaluate the enhancement quality of predict sources
-        if mode == 'dev' or mode == 'test':
-            predict_stfts = [torch.squeeze(m * source_attr['stft'].to(device)) for m in mask_list]
-            predict_stfts_np = [np.transpose(s.data.cpu().numpy()) for s in predict_stfts]
+        if mode == "dev" or mode == "test":
+            predict_stfts = [
+                torch.squeeze(m * source_attr["stft"].to(device)) for m in mask_list
+            ]
+            predict_stfts_np = [
+                np.transpose(s.data.cpu().numpy()) for s in predict_stfts
+            ]
 
             assert len(wav_length) == 1
             # reconstruct the signal using iSTFT
-            predict_srcs_np = [postprocess(librosa.istft(stft_mat,
-                hop_length=self.upstream_rate,
-                win_length=self.datarc['win_length'], 
-                window=self.datarc['window'], 
-                center=self.datarc['center'],
-                length=wav_length[0])) for stft_mat in predict_stfts_np]
+            predict_srcs_np = [
+                postprocess(
+                    librosa.istft(
+                        stft_mat,
+                        hop_length=self.upstream_rate,
+                        win_length=self.datarc["win_length"],
+                        window=self.datarc["window"],
+                        center=self.datarc["center"],
+                        length=wav_length[0],
+                    )
+                )
+                for stft_mat in predict_stfts_np
+            ]
             predict_srcs_np = np.stack(predict_srcs_np, 0)
             gt_srcs_np = torch.cat(target_wav_list, 0).data.cpu().numpy()
             mix_np = source_wav.data.cpu().numpy()
@@ -283,8 +334,8 @@ class DownstreamExpert(nn.Module):
                 mix_np,
                 gt_srcs_np,
                 predict_srcs_np,
-                sample_rate = self.datarc['rate'],
-                metrics_list = COMPUTE_METRICS,
+                sample_rate=self.datarc["rate"],
+                metrics_list=COMPUTE_METRICS,
                 compute_permutation=False,
             )
 
@@ -301,17 +352,23 @@ class DownstreamExpert(nn.Module):
                 else:
                     raise ValueError("Metric type not defined.")
 
-            assert 'batch_id' in kwargs
-            if kwargs['batch_id'] % 1000 == 0: # Save the prediction every 1000 examples
-                records['mix'].append(mix_np)
-                records['hypo'].append(predict_srcs_np)
-                records['ref'].append(gt_srcs_np)
-                records['uttname'].append(uttname_list[0])
+            assert "batch_id" in kwargs
+            if (
+                kwargs["batch_id"] % 1000 == 0
+            ):  # Save the prediction every 1000 examples
+                records["mix"].append(mix_np)
+                records["hypo"].append(predict_srcs_np)
+                records["ref"].append(gt_srcs_np)
+                records["uttname"].append(uttname_list[0])
 
-        if self.loss_type == "MSE": # mean square loss
-            loss = self.objective.compute_loss(mask_list, feat_length, source_attr, target_attr)
-        elif self.loss_type == "SISDR": # end-to-end SI-SNR loss
-            loss = self.objective.compute_loss(mask_list, feat_length, source_attr, wav_length, target_wav_list)
+        if self.loss_type == "MSE":  # mean square loss
+            loss = self.objective.compute_loss(
+                mask_list, feat_length, source_attr, target_attr
+            )
+        elif self.loss_type == "SISDR":  # end-to-end SI-SNR loss
+            loss = self.objective.compute_loss(
+                mask_list, feat_length, source_attr, wav_length, target_wav_list
+            )
         else:
             raise ValueError("Loss type not defined.")
 
@@ -355,7 +412,7 @@ class DownstreamExpert(nn.Module):
                 according to the evaluation result, like the best.ckpt on the dev set
                 You can return nothing or an empty list when no need to save the checkpoint
         """
-        if mode == 'train':
+        if mode == "train":
             avg_loss = np.mean(records["loss"])
             logger.add_scalar(
                 f"separation_stft/{mode}-loss", avg_loss, global_step=global_step
@@ -370,31 +427,54 @@ class DownstreamExpert(nn.Module):
             for metric in COMPUTE_METRICS:
                 avg_metric = np.mean(records[metric])
                 if mode == "test" or mode == "dev":
-                    print("Average {} of {} utts is {:.4f}".format(metric, len(records[metric]), avg_metric))
+                    print(
+                        "Average {} of {} utts is {:.4f}".format(
+                            metric, len(records[metric]), avg_metric
+                        )
+                    )
                     print(metric, avg_metric, file=eval_result)
 
                 logger.add_scalar(
-                    f'separation_stft/{mode}-'+metric,
+                    f"separation_stft/{mode}-" + metric,
                     avg_metric,
-                    global_step=global_step
+                    global_step=global_step,
                 )
 
             save_ckpt = []
-            assert 'pesq' in records
-            if mode == "dev" and np.mean(records['pesq']) > self.best_score:
-                self.best_score = torch.ones(1) * np.mean(records['pesq'])
+            assert "pesq" in records
+            if mode == "dev" and np.mean(records["pesq"]) > self.best_score:
+                self.best_score = torch.ones(1) * np.mean(records["pesq"])
                 save_ckpt.append(f"best-states-{mode}.ckpt")
 
-            for s in ['mix', 'ref', 'hypo', 'uttname']:
+            for s in ["mix", "ref", "hypo", "uttname"]:
                 assert s in records
-            for i in range(len(records['uttname'])):
-                utt = records['uttname'][i]
-                mix_wav, ref_wav, hypo_wav = records['mix'][i][0, :], records['ref'][i][0, :], records['hypo'][i][0, :]
+            for i in range(len(records["uttname"])):
+                utt = records["uttname"][i]
+                mix_wav, ref_wav, hypo_wav = (
+                    records["mix"][i][0, :],
+                    records["ref"][i][0, :],
+                    records["hypo"][i][0, :],
+                )
                 mix_wav = librosa.util.normalize(mix_wav, norm=np.inf, axis=None)
                 ref_wav = librosa.util.normalize(ref_wav, norm=np.inf, axis=None)
                 hypo_wav = librosa.util.normalize(hypo_wav, norm=np.inf, axis=None)
-                logger.add_audio('step{:06d}_{}_mix.wav'.format(global_step, utt), mix_wav, global_step=global_step, sample_rate=self.datarc['rate'])
-                logger.add_audio('step{:06d}_{}_ref.wav'.format(global_step, utt), ref_wav, global_step=global_step, sample_rate=self.datarc['rate'])
-                logger.add_audio('step{:06d}_{}_hypo.wav'.format(global_step, utt), hypo_wav, global_step=global_step, sample_rate=self.datarc['rate'])
+                logger.add_audio(
+                    "step{:06d}_{}_mix.wav".format(global_step, utt),
+                    mix_wav,
+                    global_step=global_step,
+                    sample_rate=self.datarc["rate"],
+                )
+                logger.add_audio(
+                    "step{:06d}_{}_ref.wav".format(global_step, utt),
+                    ref_wav,
+                    global_step=global_step,
+                    sample_rate=self.datarc["rate"],
+                )
+                logger.add_audio(
+                    "step{:06d}_{}_hypo.wav".format(global_step, utt),
+                    hypo_wav,
+                    global_step=global_step,
+                    sample_rate=self.datarc["rate"],
+                )
 
             return save_ckpt

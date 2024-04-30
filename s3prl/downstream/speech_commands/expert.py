@@ -59,6 +59,7 @@ class DownstreamExpert(nn.Module):
             drop_last=drop_last,
             num_workers=self.datarc["num_workers"],
             collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     def _get_balanced_dev_dataloader(self, dataset, drop_last=False):
@@ -71,6 +72,7 @@ class DownstreamExpert(nn.Module):
             drop_last=drop_last,
             num_workers=self.datarc["num_workers"],
             collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     def _get_dataloader(self, dataset):
@@ -81,6 +83,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             num_workers=self.datarc["num_workers"],
             collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     # Interface

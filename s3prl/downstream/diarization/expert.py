@@ -38,7 +38,9 @@ class DownstreamExpert(nn.Module):
     eg. downstream forward, metric computation, contents to log
     """
 
-    def __init__(self, upstream_dim, upstream_rate, downstream_expert, expdir, **kwargs):
+    def __init__(
+        self, upstream_dim, upstream_rate, downstream_expert, expdir, **kwargs
+    ):
         super(DownstreamExpert, self).__init__()
         self.upstream_dim = upstream_dim
         self.upstream_rate = upstream_rate
@@ -80,8 +82,11 @@ class DownstreamExpert(nn.Module):
         self.score_dir = os.path.join(expdir, "scoring")
         self.save_predictions = self.scorerc["save_predictions"]
 
-        if ((not is_initialized()) or get_rank() == 0) \
-                and not os.path.exists(self.score_dir) and self.save_predictions:
+        if (
+            ((not is_initialized()) or get_rank() == 0)
+            and not os.path.exists(self.score_dir)
+            and self.save_predictions
+        ):
             os.makedirs(os.path.join(self.score_dir, "predictions"))
 
         self.model = Model(
@@ -145,6 +150,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=True,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def _get_dev_dataloader(self, dataset):
@@ -156,6 +162,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=True,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def _get_test_dataloader(self, dataset):

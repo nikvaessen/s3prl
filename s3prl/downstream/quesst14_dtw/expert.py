@@ -59,6 +59,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             num_workers=self.datarc["num_workers"],
             collate_fn=self.test_dataset.collate_fn,
+            persistent_workers=True,
         )
 
     # Interface
@@ -127,7 +128,8 @@ class DownstreamExpert(nn.Module):
                 continue
 
             for doc, doc_name in zip(docs, doc_names):
-                jobs_to_submit.append(joblib.delayed(match)(
+                jobs_to_submit.append(
+                    joblib.delayed(match)(
                         query,
                         doc,
                         query_name,
@@ -135,11 +137,12 @@ class DownstreamExpert(nn.Module):
                         dist_fn,
                         self.dtwrc["minmax_norm"],
                         dtwrc,
-                ))
-            print(f'\rsubmitting {len(jobs_to_submit):{str_len}d}/{total}', end='')
+                    )
+                )
+            print(f"\rsubmitting {len(jobs_to_submit):{str_len}d}/{total}", end="")
 
         print(f"\nwaiting for completion of total={len(jobs_to_submit)} jobs")
-        parallel = joblib.Parallel(n_jobs=self.max_workers, return_as='generator')
+        parallel = joblib.Parallel(n_jobs=self.max_workers, return_as="generator")
         for query_name, doc_name, score in tqdm(
             parallel(jobs_to_submit), total=len(jobs_to_submit), ncols=0, desc="DTW"
         ):

@@ -133,6 +133,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=True,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     def _get_eval_dataloader(self, dataset):
@@ -144,6 +145,7 @@ class DownstreamExpert(nn.Module):
             drop_last=False,
             pin_memory=True,
             collate_fn=dataset.collate_fn,
+            persistent_workers=True
         )
 
     def get_dataloader(self, mode):

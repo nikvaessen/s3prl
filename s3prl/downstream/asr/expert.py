@@ -146,6 +146,7 @@ class DownstreamExpert(nn.Module):
             sampler=sampler,
             num_workers=self.datarc["num_workers"],
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def _get_eval_dataloader(self, dataset):
@@ -155,6 +156,7 @@ class DownstreamExpert(nn.Module):
             shuffle=False,
             num_workers=self.datarc["num_workers"],
             collate_fn=dataset.collate_fn,
+            persistent_workers=True,
         )
 
     def _compute_metrics(
