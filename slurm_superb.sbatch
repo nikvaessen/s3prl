@@ -11,7 +11,7 @@
 #SBATCH --qos=das-large
 #SBATCH --exclude=cn104
 
-#SBATCH --mem=39
+#SBATCH --mem=39GB
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:1
 #SBATCH --time=48:00:00
