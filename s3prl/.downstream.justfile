@@ -304,7 +304,7 @@ source-separation experiment-name upstream upstream-path=path learning-rate=lr3:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/ss/best-states-dev.ckpt > {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
     cat {{exp-dir}}/{{experiment-name}}/ss/superb.ss.txt
 
 speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr4:
@@ -320,5 +320,5 @@ speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr4
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/dev-best.ckpt > {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
+    python3 run_downstream.py -m evaluate -e {{exp-dir}}/{{experiment-name}}/se/best-states-dev.ckpt > {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
     cat {{exp-dir}}/{{experiment-name}}/se/superb.se.txt
