@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import pathlib
+import warnings
 from typing import Optional
 
 import click
@@ -8,9 +9,11 @@ import click
 def get_metric(
     result_dir: pathlib.Path,
     task_name: str,
-    metric_name: str,
+    line_id: str,
     make_percentage: bool = True,
     file_id: Optional[str] = None,
+    split_token: str = ":",
+    split_idx: int = 1,
 ):
     out_file = (
         result_dir
@@ -18,17 +21,21 @@ def get_metric(
         / f"superb.{task_name if file_id is None else file_id}.txt"
     )
 
+    if not out_file.exists():
+        warnings.warn(f"{out_file} does not exist!")
+        return -1
+
     with out_file.open("r") as f:
         for ln in f.readlines():
-            if metric_name in ln:
-                value = float(ln.split(metric_name)[1].removeprefix(":").strip())
+            if line_id in ln:
+                value = float(ln.strip().split(split_token)[split_idx].strip())
 
                 if make_percentage:
                     value *= 100
 
                 return value
 
-    raise ValueError(f"could not find metric `{metric_name}` for {out_file}")
+    raise ValueError(f"could not find line with '{line_id}' for {out_file}")
 
 
 def get_der(der_file: pathlib.Path):
@@ -81,16 +88,61 @@ def get_er_acc(result_dir: pathlib.Path):
     return sum(accuracy_list) / len(accuracy_list)
 
 
+def get_vc_metrics(result_dir: pathlib.Path):
+    mcd_list = []
+    wer_list = []
+    ar_list = []
+
+    for spk in ["TEM1", "TEM2", "TEF1", "TEF2"]:
+        mcd_list.append(
+            get_metric(
+                result_dir,
+                f"vc/{spk}",
+                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                split_token=" ",
+                split_idx=9,
+                file_id=f"vc.{spk}",
+                make_percentage=False,
+            )
+        )
+        wer_list.append(
+            get_metric(
+                result_dir,
+                f"vc/{spk}",
+                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                split_token=" ",
+                split_idx=14,
+                file_id=f"vc.{spk}",
+                make_percentage=False,
+            )
+        )
+        ar_list.append(
+            get_metric(
+                result_dir,
+                f"vc/{spk}",
+                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                split_token=" ",
+                split_idx=15,
+                file_id=f"vc.{spk}",
+                make_percentage=False,
+            )
+        )
+
+    mcd = sum(mcd_list) / 4
+    wer = sum(wer_list) / 4
+    ar = sum(ar_list) / 4
+
+    return mcd, wer, ar
+
+
 @click.command()
 @click.argument("result_directory", type=pathlib.Path)
 def main(result_directory: pathlib.Path):
     # pr
     pr_per = get_metric(result_directory, "pr", "test per")
-    print(f"{pr_per=:.2f}")
 
     # asr
     asr_wer = get_metric(result_directory, "asr", "test-clean wer", False)
-    print(f"{asr_wer=:.2f}")
 
     # asr-ood
     asr_wer_es = get_metric(
@@ -106,61 +158,75 @@ def main(result_directory: pathlib.Path):
         result_directory, "asr-ood", "test wer", file_id="sbcsae.ood-asr"
     )
 
-    print(f"{asr_wer_es=:.2f}")
-    print(f"{asr_wer_ar=:.2f}")
-    print(f"{asr_cer_zh=:.2f}")
-    print(f"{asr_wer_spoken=:.2f}")
-
     # ks
     ks_acc = get_metric(result_directory, "ks", "test acc")
-    print(f"{ks_acc=:.2f}")
 
     # qbe
     qbe_mtwv = get_qbe_mtwv(result_directory)
-    print(f"{qbe_mtwv=:.2f}")
 
     # sid
     sid_acc = get_metric(result_directory, "sid", "test acc")
-    print(f"{sid_acc=:.2f}")
 
     # asv
-    asv_eer = get_metric(result_directory, "asv", "achieves EER")
-    print(f"{asv_eer=:.2f}")
+    asv_eer = get_metric(
+        result_directory, "asv", "achieves EER", split_token=" ", split_idx=5
+    )
 
     # sd
     sd_der = get_der(result_directory / "sd" / "superb.sd.txt")
-    print(f"{sd_der=:.2f}")
 
     # er
     er_acc = get_er_acc(result_directory)
-    print(f"{er_acc=:.2f}")
 
     # ic
     ic_acc = get_metric(result_directory, "ic", "test acc")
-    print(f"{ic_acc=:.2f}")
 
     # slot filling
     sf_f0 = get_metric(result_directory, "sf", "slot_type_f1")
     sf_cer = get_metric(result_directory, "sf", "slot_value_cer")
-    print(f"{sf_f0=:.2f}")
-    print(f"{sf_cer=:.2f}")
 
     # st
-    st_bleu = -1
+    st_bleu = get_metric(
+        result_directory,
+        "st",
+        "BLEU =",
+        split_token=" ",
+        split_idx=2,
+        make_percentage=False,
+    )
 
     # vc
-    vc_mcd = -1
-    vc_wer = -1
-    vc_asv_ar = -1
+    vc_mcd, vc_wer, vc_asv_ar = get_vc_metrics(result_directory)
 
     # se
-    se_pesq = -1
-    se_stoi = -1
+    se_pesq = get_metric(
+        result_directory,
+        "se",
+        "Average pesq",
+        split_token=" ",
+        split_idx=6,
+        make_percentage=False,
+    )
+    se_stoi = get_metric(
+        result_directory,
+        "se",
+        "Average stoi",
+        split_token=" ",
+        split_idx=6,
+        make_percentage=False,
+    )
 
     # ss
-    ss_si_sdri = -1
+    ss_si_sdri = get_metric(
+        result_directory,
+        "ss",
+        "si_sdr",
+        split_token=" ",
+        split_idx=5,
+        make_percentage=False,
+    )
 
-    # write txt
+    # write csv
     with open(result_directory / "results.csv", "w") as f:
         # header
         print("pr", file=f, end=",")
@@ -209,6 +275,63 @@ def main(result_directory: pathlib.Path):
         print(se_pesq, file=f, end=",")
         print(se_stoi, file=f, end=",")
         print(ss_si_sdri, file=f, end="\n")
+
+    with open(result_directory / "results.drive.txt", "w") as f:
+        # results
+        print(pr_per, file=f)
+        print(asr_wer, file=f)
+        print(asr_wer_es, file=f)
+        print(asr_wer_ar, file=f)
+        print(asr_cer_zh, file=f)
+        print(asr_wer_spoken, file=f)
+        print(ks_acc, file=f)
+        print(qbe_mtwv, file=f)
+        print(file=f)
+        print(sid_acc, file=f)
+        print(asv_eer, file=f)
+        print(sd_der, file=f)
+        print(file=f)
+        print(er_acc, file=f)
+        print(file=f)
+        print(ic_acc, file=f)
+        print(sf_f0, file=f)
+        print(sf_cer, file=f)
+        print(st_bleu, file=f)
+        print(file=f)
+        print(vc_mcd, file=f)
+        print(vc_wer, file=f)
+        print(vc_asv_ar, file=f)
+        print(se_pesq, file=f)
+        print(se_stoi, file=f)
+        print(ss_si_sdri, file=f)
+
+    with open(result_directory / "results.txt", "w") as f:
+        # results
+        print(f"{pr_per=:.2f}", file=f)
+        print(f"{asr_wer=:.2f}", file=f)
+        print(f"{asr_wer_es=:.2f}", file=f)
+        print(f"{asr_wer_ar=:.2f}", file=f)
+        print(f"{asr_cer_zh=:.2f}", file=f)
+        print(f"{asr_wer_spoken=:.2f}", file=f)
+        print(f"{ks_acc=:.2f}", file=f)
+        print(f"{qbe_mtwv=:.2f}", file=f)
+        print(f"{sid_acc=:.2f}", file=f)
+        print(f"{asv_eer=:.2f}", file=f)
+        print(f"{sd_der=:.2f}", file=f)
+        print(f"{er_acc=:.2f}", file=f)
+        print(f"{ic_acc=:.2f}", file=f)
+        print(f"{sf_f0=:.2f}", file=f)
+        print(f"{sf_cer=:.2f}", file=f)
+        print(f"{st_bleu=:.2f}", file=f)
+        print(f"{vc_mcd=:.2f}", file=f)
+        print(f"{vc_wer=:.2f}", file=f)
+        print(f"{vc_asv_ar=:.2f}", file=f)
+        print(f"{se_pesq=:.2f}", file=f)
+        print(f"{se_stoi=:.2f}", file=f)
+        print(f"{ss_si_sdri=:.2f}", file=f)
+
+    with open(result_directory / "results.txt", "r") as f:
+        print(f.read(), end="")
 
 
 if __name__ == "__main__":
