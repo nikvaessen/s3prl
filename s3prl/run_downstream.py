@@ -155,9 +155,9 @@ def get_downstream_args():
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    torch.multiprocessing.set_sharing_strategy('file_system')
-    torch.multiprocessing.set_start_method('spawn')
-    torch.set_num_threads(1)
+    # torch.multiprocessing.set_sharing_strategy('file_system')
+    # torch.multiprocessing.set_start_method('spawn')
+    # torch.set_num_threads(1)
     # torchaudio.set_audio_backend('sox_io')
     # hack_isinstance()
     #time.sleep(random.randint(1, 60))
