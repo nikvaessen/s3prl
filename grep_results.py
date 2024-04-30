@@ -39,6 +39,10 @@ def get_metric(
 
 
 def get_der(der_file: pathlib.Path):
+    if not der_file.exists():
+        warnings.warn(f"{der_file} does not exist!")
+        return -1
+
     last_line = der_file.open("r").readlines()[-1]
     der_score = last_line.split("*** OVERALL ***")[1].strip().split(" ")[0]
 
@@ -56,6 +60,10 @@ def get_qbe_mtwv(result_dir: pathlib.Path):
     )
 
     def _get_score(outf):
+        if not outf.exists():
+            warnings.warn(f"{outf} does not exist!")
+            return -1
+
         with outf.open("r") as f:
             for ln in f.readlines():
                 if "maxTWV" in ln:
@@ -213,7 +221,7 @@ def main(result_directory: pathlib.Path):
         "Average stoi",
         split_token=" ",
         split_idx=6,
-        make_percentage=False,
+        make_percentage=True,
     )
 
     # ss
