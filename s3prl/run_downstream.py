@@ -146,7 +146,7 @@ def get_downstream_args():
     if args.override is not None and args.override.lower() != "none":
         override(args.override, args, config)
         os.makedirs(args.expdir, exist_ok=True)
-    
+
     return args, config, backup_files
 
 
@@ -156,6 +156,8 @@ def main():
     # torch.multiprocessing.set_sharing_strategy('file_system')
     # torchaudio.set_audio_backend('sox_io')
     # hack_isinstance()
+    torch.multiprocessing.set_start_method('spawn')
+    torch.set_num_threads(1)
 
     # get config and arguments
     args, config, backup_files = get_downstream_args()
@@ -187,7 +189,7 @@ def main():
         huggingface_token = HfApi().login(username=hf_user, password=hf_password)
         HfFolder.save_token(huggingface_token)
         print(f"Logged into Hugging Face Hub with user: {hf_user}")
-    
+
     # Save command
     if is_leader_process():
         with open(os.path.join(args.expdir, f'args_{get_time_tag()}.yaml'), 'w') as file:
