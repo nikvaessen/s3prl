@@ -7,6 +7,7 @@ import shutil
 import random
 import tempfile
 import importlib
+from functools import lru_cache
 from pathlib import Path
 
 import torch
@@ -201,7 +202,7 @@ class Runner():
 
     def _get_optimizer(self, model_params):
         optimizer = get_optimizer(
-            model_params, 
+            model_params,
             self.config['runner']['total_steps'],
             self.config['optimizer']
         )
@@ -428,6 +429,9 @@ class Runner():
         if is_leader_process():
             logger.close()
 
+    @lru_cache()
+    def _get_dataloader(self, split: str):
+        return self.downstream.model.get_dataloader(split)
 
     def evaluate(self, split=None, logger=None, global_step=0):
         """evaluate function will always be called on a single process even during distributed training"""
@@ -439,7 +443,7 @@ class Runner():
             tempdir = tempfile.mkdtemp()
             logger = SummaryWriter(tempdir)
 
-        # fix seed to guarantee the same evaluation protocol across steps 
+        # fix seed to guarantee the same evaluation protocol across steps
         random.seed(self.args.seed)
         np.random.seed(self.args.seed)
         torch.manual_seed(self.args.seed)
@@ -455,7 +459,7 @@ class Runner():
             entry.model.eval()
 
         # prepare data
-        dataloader = self.downstream.model.get_dataloader(split)
+        dataloader = self._get_dataloader(split)
         evaluate_ratio = float(self.config["runner"].get("evaluate_ratio", 1))
         evaluate_steps = round(len(dataloader) * evaluate_ratio)
 
@@ -531,7 +535,7 @@ class Runner():
             organization = os.environ.get("HF_USERNAME")
         huggingface_token = HfFolder.get_token()
         print(f"[Runner] - Organisation to push fine-tuned model to: {organization}")
-        
+
         # Extract upstream repository metadata
         if self.args.hub == "huggingface":
             model_info = HfApi().model_info(self.args.upstream, token=huggingface_token)
