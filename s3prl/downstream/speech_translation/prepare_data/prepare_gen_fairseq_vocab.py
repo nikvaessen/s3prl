@@ -69,8 +69,8 @@ if __name__ == '__main__':
                     quoting=csv.QUOTE_NONE,
                 )
                 for line in reader:
-                    print(line[args.src_key], file=src_f)
-                    print(line[args.tgt_key], file=tgt_f)
+                    print(line[args.src_key], file=src_f, flush=True)
+                    print(line[args.tgt_key], file=tgt_f, flush=True)
             if not args.combine:
                 create_sentencepiece(
                     [src_f.name],
