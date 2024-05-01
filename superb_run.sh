@@ -1,38 +1,4 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=superb
-#SBATCH --output=superb_%A_%a.out
-#SBATCH --error=superb_%A_%a.err
-#SBATCH --mail-type=BEGIN,END,FAIL
-
-#SBATCH --array=0-24
-
-#SBATCH --partition=das
-#SBATCH --account=das
-#SBATCH --qos=das-large
-#SBATCH --exclude=cn104
-
-#SBATCH --mem=39GB
-#SBATCH --cpus-per-task=8
-#SBATCH --gres=gpu:1
-#SBATCH --time=48:00:00
-
-# check cmd arguments are given
-if [ -z "$1" ]; then
-    echo 'please provide "$NAME" in $1'
-    exit 1
-fi
-if [ -z "$2" ]; then
-    echo 'please provide "$UPSTREAM" in $2'
-    exit 1
-fi
-if [ -z "$3" ]; then
-    echo 'please provide "$NUM_LAYERS" in $3'
-    exit 1
-fi
-if [ -z "$4" ]; then
-    echo 'please provide "$UPSTREAM_PATH" in $4'
-    exit 1
-fi
 
 # set arguments
 NAME="$1"
@@ -40,13 +6,9 @@ UPSTREAM="$2"
 NUM_LAYERS="$3"
 UPSTREAM_PATH="$4"
 
-# default LR if not given
 if [ -z "$5" ]; then
     LR=$5
 fi
-
-# activate virtual environment
-source .venv/bin/activate
 
 case $SLURM_ARRAY_TASK_ID in
     0)
