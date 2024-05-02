@@ -71,6 +71,9 @@ def get_qbe_mtwv(result_dir: pathlib.Path):
                     end_idx = ln.find("Threshold")
                     return float(ln[start_idx:end_idx].split(":")[1].strip()) * 100
 
+        warnings.warn(f"{outf} does not contain maxTWV")
+        return -1
+
     best_layer = -1
     best_mtwv = -1
 
