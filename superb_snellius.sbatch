@@ -30,7 +30,7 @@ UPSTREAM="$2"
 UPSTREAM_PATH="$3"
 
 # default LR if not given
-if [ -z "$4" ]; then
+if [[ -n "$4" ]]; then
     LR=$4
 fi
 
