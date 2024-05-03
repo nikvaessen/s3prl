@@ -3,8 +3,7 @@
 # set arguments
 NAME="$1"
 UPSTREAM="$2"
-NUM_LAYERS="$3"
-UPSTREAM_PATH="$4"
+UPSTREAM_PATH="$3"
 
 if [ -z "$5" ]; then
     LR=$5
@@ -75,9 +74,6 @@ case $SLURM_ARRAY_TASK_ID in
         fi
         ;;
     7)
-        just downstream::query-by-example-spoken-term-detection "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$NUM_LAYERS"
-        ;;
-    8)
         if [ "$LR" == "wavlm" ]; then
             just downstream::speaker-identificaton "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 2e-1
         elif [ -n "$LR" ]; then
@@ -86,7 +82,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speaker-identificaton "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    9)
+    8)
         if [ "$LR" == "wavlm" ]; then
             just downstream::speaker-verification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 5e-5
         elif [ -n "$LR" ]; then
@@ -95,7 +91,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speaker-verification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    10)
+    9)
         if [ "$LR" == "wavlm" ]; then
             just downstream::speaker-diarization "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 2e-3
         elif [ -n "$LR" ]; then
@@ -104,7 +100,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speaker-diarization "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    11)
+    10)
         if [ "$LR" == "wavlm" ]; then
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold1 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -113,7 +109,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold1 "$UPSTREAM_PATH"
         fi
         ;;
-    12)
+    11)
         if [ "$LR" == "wavlm" ]; then
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold2 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -122,7 +118,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold2 "$UPSTREAM_PATH"
         fi
         ;;
-    13)
+    12)
         if [ "$LR" == "wavlm" ]; then
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold3 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -131,7 +127,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold3 "$UPSTREAM_PATH"
         fi
         ;;
-    14)
+    13)
         if [ "$LR" == "wavlm" ]; then
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold4 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -140,7 +136,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold4 "$UPSTREAM_PATH"
         fi
         ;;
-    15)
+    14)
         if [ "$LR" == "wavlm" ]; then
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold5 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -149,7 +145,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::emotion-recognition "$NAME" "$UPSTREAM" fold5 "$UPSTREAM_PATH"
         fi
         ;;
-    16)
+    15)
         if [ "$LR" == "wavlm" ]; then
             just downstream::intent-classification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 5e-5
         elif [ -n "$LR" ]; then
@@ -158,7 +154,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::intent-classification "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    17)
+    16)
         if [ "$LR" == "wavlm" ]; then
             just downstream::slot-filling "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 2e-4
         elif [ -n "$LR" ]; then
@@ -167,7 +163,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::slot-filling "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    18)
+    17)
         if [ "$LR" == "wavlm" ]; then
             just downstream::speech-translation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 1e-3
         elif [ -n "$LR" ]; then
@@ -176,7 +172,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speech-translation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    19)
+    18)
         if [ "$LR" == "wavlm" ]; then
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEM1 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -185,7 +181,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEM1 "$UPSTREAM_PATH"
         fi
         ;;
-    20)
+    19)
         if [ "$LR" == "wavlm" ]; then
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEM2 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -194,7 +190,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEM2 "$UPSTREAM_PATH"
         fi
         ;;
-    21)
+    20)
         if [ "$LR" == "wavlm" ]; then
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEF1 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -203,7 +199,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEF1 "$UPSTREAM_PATH"
         fi
         ;;
-    22)
+    21)
         if [ "$LR" == "wavlm" ]; then
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEF2 "$UPSTREAM_PATH" 1e-4
         elif [ -n "$LR" ]; then
@@ -212,7 +208,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::voice-conversion "$NAME" "$UPSTREAM" TEF2 "$UPSTREAM_PATH"
         fi
         ;;
-    23)
+    22)
         if [ "$LR" == "wavlm" ]; then
             just downstream::source-separation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 5e-4
         elif [ -n "$LR" ]; then
@@ -221,7 +217,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::source-separation "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-    24)
+    23)
         if [ "$LR" == "wavlm" ]; then
             just downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" 5e-4
         elif [ -n "$LR" ]; then
@@ -230,6 +226,7 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
+
     *)
         echo "No command specified for task ID $SLURM_ARRAY_TASK_ID"
         ;;

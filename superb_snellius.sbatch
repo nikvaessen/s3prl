@@ -3,7 +3,7 @@
 #SBATCH --output=slurm-%A-%a.out
 #SBATCH --error=slurm-%A-%a.err
 
-#SBATCH --array=0-24
+#SBATCH --array=0-23
 
 #SBATCH --partition=gpu
 
@@ -20,10 +20,6 @@ if [ -z "$2" ]; then
     exit 1
 fi
 if [ -z "$3" ]; then
-    echo 'please provide "$NUM_LAYERS" in $3'
-    exit 1
-fi
-if [ -z "$4" ]; then
     echo 'please provide "$UPSTREAM_PATH" in $4'
     exit 1
 fi
@@ -31,16 +27,15 @@ fi
 # set arguments
 NAME="$1"
 UPSTREAM="$2"
-NUM_LAYERS="$3"
-UPSTREAM_PATH="$4"
+UPSTREAM_PATH="$3"
 
 # default LR if not given
-if [ -z "$5" ]; then
-    LR=$5
+if [ -z "$4" ]; then
+    LR=$4
 fi
 
 # activate virtual environment
-source $HOME/bin/load-modules
+source "$HOME"/bin/load-modules
 source .venv/bin/activate
 
 # set path to out and err file
@@ -48,4 +43,4 @@ export SLURM_OUT_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
 export SLURM_ERR_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
 
 # run superb benchmark
-bash superb_run.sh "$NAME" "$UPSTREAM" "$NUM_LAYERS" "$UPSTREAM_PATH" "$LR"
+bash superb_run.sh "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"

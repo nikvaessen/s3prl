@@ -4,7 +4,7 @@
 #SBATCH --error=slurm-%A-%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-#SBATCH --array=0-24
+#SBATCH --array=0-23
 
 #SBATCH --partition=icis
 #SBATCH --account=icis
@@ -26,10 +26,6 @@ if [ -z "$2" ]; then
     exit 1
 fi
 if [ -z "$3" ]; then
-    echo 'please provide "$NUM_LAYERS" in $3'
-    exit 1
-fi
-if [ -z "$4" ]; then
     echo 'please provide "$UPSTREAM_PATH" in $4'
     exit 1
 fi
@@ -37,12 +33,11 @@ fi
 # set arguments
 NAME="$1"
 UPSTREAM="$2"
-NUM_LAYERS="$3"
-UPSTREAM_PATH="$4"
+UPSTREAM_PATH="$3"
 
 # default LR if not given
-if [ -z "$5" ]; then
-    LR=$5
+if [ -z "$4" ]; then
+    LR=$4
 fi
 
 # activate virtual environment
