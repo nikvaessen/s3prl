@@ -21,6 +21,7 @@ phoneme-recognition experiment-name upstream upstream-path=path learning-rate=lr
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -46,6 +47,7 @@ speech-recognition experiment-name upstream upstream-path=path learning-rate=lr4
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -74,6 +76,7 @@ ood-asr-cv experiment-name upstream lang upstream-path=path learning-rate=lr4:
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -103,6 +106,7 @@ ood-asr-SBCSAE experiment-name upstream upstream-path=path learning-rate=lr4:
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -122,6 +126,8 @@ ood-asr-SBCSAE experiment-name upstream upstream-path=path learning-rate=lr4:
     config.optimizer.lr={{learning-rate}}
 
     # test
+    mkdir -p $RUN_DIR
+
     python3 run_downstream.py -m evaluate -e $RUN_DIR/dev-best.ckpt > $RUN_DIR/evaluate.ood-asr.sbcsae.txt
     cat $RUN_DIR/evaluate.ood-asr.sbcsae.txt
 
@@ -131,8 +137,10 @@ keyword-spotting experiment-name upstream upstream-path=path learning-rate=lr4:
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
+
     # train
     python3 run_downstream.py \
     -d speech_commands -a \
@@ -156,6 +164,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     RUN_DIR={{exp-dir}}/{{experiment-name}}/qbe
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -206,6 +215,7 @@ speaker-identificaton experiment-name upstream upstream-path=path learning-rate=
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -230,6 +240,7 @@ speaker-verification experiment-name upstream upstream-path=path learning-rate=l
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -254,6 +265,7 @@ speaker-diarization experiment-name upstream upstream-path=path learning-rate=lr
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -283,6 +295,7 @@ emotion-recognition experiment-name upstream fold upstream-path=path learning-ra
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -309,6 +322,7 @@ intent-classification experiment-name upstream upstream-path=path learning-rate=
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -333,6 +347,7 @@ slot-filling experiment-name upstream upstream-path=path learning-rate=lr4:
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -359,6 +374,7 @@ speech-translation experiment-name upstream upstream-path=path learning-rate=lr3
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -385,6 +401,7 @@ voice-conversion experiment-name upstream tgt-spk upstream-path=path learning-ra
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -414,6 +431,7 @@ source-separation experiment-name upstream upstream-path=path learning-rate=lr3:
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
@@ -438,6 +456,7 @@ speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr4
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
     # write SLURM log files to $RUN_DIR
+    mkdir -p $RUN_DIR
     if [[ ! -z "${SLURM_OUT_FILE+x}" ]]; then ln -s $SLURM_OUT_FILE $RUN_DIR/$(basename $SLURM_OUT_FILE); fi
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
