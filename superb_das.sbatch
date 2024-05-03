@@ -8,8 +8,7 @@
 
 #SBATCH --partition=das
 #SBATCH --account=das
-#SBATCH --qos=das-large
-#SBATCH --exclude=cn104
+#SBATCH --qos=das-preempt
 
 #SBATCH --mem=39GB
 #SBATCH --cpus-per-task=8

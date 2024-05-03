@@ -8,8 +8,7 @@
 
 #SBATCH --partition=icis
 #SBATCH --account=icis
-#SBATCH --qos=icis-large
-#SBATCH --exclude=cn104
+#SBATCH --qos=icis-preempt
 
 #SBATCH --mem=39GB
 #SBATCH --cpus-per-task=8
