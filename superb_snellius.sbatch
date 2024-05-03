@@ -40,6 +40,7 @@ if [ -z "$5" ]; then
 fi
 
 # activate virtual environment
+source $HOME/bin/load-modules
 source .venv/bin/activate
 
 # run superb benchmark
