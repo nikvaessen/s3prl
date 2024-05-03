@@ -273,7 +273,14 @@ class Runner():
         records = defaultdict(list)
         epoch = self.init_ckpt.get('Epoch', 0)
         train_split = self.config['runner'].get("train_dataloader", "train")
+
+        nan_or_oom_count = 0
+        stop_training_after_eval = False
+
         while pbar.n < pbar.total:
+            if stop_training_after_eval:
+                break
+
             try:
                 dataloader = self.downstream.model.get_dataloader(train_split, epoch=epoch)
             except TypeError as e:
@@ -327,6 +334,7 @@ class Runner():
                         with torch.cuda.device(self.args.device):
                             torch.cuda.empty_cache()
                         optimizer.zero_grad()
+                        nan_or_oom_count += 1
                         continue
                     else:
                         raise
@@ -345,11 +353,13 @@ class Runner():
                     trainable_paras, self.config['runner']['gradient_clipping'])
 
                 # optimize
+                if math.isnan(grad_norm):
+                    print(f'[Runner] - grad norm is NaN at step {global_step}')
+                    nan_or_oom_count += 1
+
                 if amp:
                     scaler.step(optimizer)
                     scaler.update()
-                elif math.isnan(grad_norm):
-                    print(f'[Runner] - grad norm is NaN at step {global_step}')
                 else:
                     optimizer.step()
                 optimizer.zero_grad()
@@ -382,6 +392,10 @@ class Runner():
                 if global_step % self.config['runner']['eval_step'] == 0:
                     for split in self.config['runner']['eval_dataloaders']:
                         save_names += self.evaluate(split, logger, global_step)
+
+                    if nan_or_oom_count > 100:
+                        stop_training_after_eval = True
+                        break
 
                 if global_step % self.config['runner']['save_step'] == 0:
                     def check_ckpt_num(directory):
