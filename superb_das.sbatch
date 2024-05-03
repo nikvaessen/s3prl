@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=superb
-#SBATCH --output=superb_%A_%a.out
-#SBATCH --error=superb_%A_%a.err
+#SBATCH --output=slurm-%A-%a.out
+#SBATCH --error=slurm-%A-%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 #SBATCH --array=0-24
@@ -47,6 +47,10 @@ fi
 
 # activate virtual environment
 source .venv/bin/activate
+
+# set path to out and err file
+export SLURM_OUT_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
+export SLURM_ERR_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
 
 # run superb benchmark
 bash superb_run.sh "$NAME" "$UPSTREAM" "$NUM_LAYERS" "$UPSTREAM_PATH" "$LR"
