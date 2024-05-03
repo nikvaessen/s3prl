@@ -5,8 +5,8 @@ NAME="$1"
 UPSTREAM="$2"
 UPSTREAM_PATH="$3"
 
-if [ -z "$5" ]; then
-    LR=$5
+if [ -z "$4" ]; then
+    LR=$4
 fi
 
 case $SLURM_ARRAY_TASK_ID in
