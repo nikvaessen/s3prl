@@ -5,7 +5,7 @@ NAME="$1"
 UPSTREAM="$2"
 UPSTREAM_PATH="$3"
 
-if [ -z "$4" ]; then
+if [ -n "$4" ]; then
     LR=$4
 fi
 
