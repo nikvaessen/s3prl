@@ -48,4 +48,4 @@ export SLURM_OUT_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
 export SLURM_ERR_FILE=$PWD/slurm-"$SLURM_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
 
 # run superb benchmark
-bash superb_run.sh "$NAME" "$UPSTREAM" "$NUM_LAYERS" "$UPSTREAM_PATH" "$LR"
+bash superb_run_with_learning_rate.sh "$NAME" "$UPSTREAM" "$UPSTREAM_PATH" "$LR"
