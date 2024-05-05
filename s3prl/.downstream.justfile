@@ -447,8 +447,8 @@ source-separation experiment-name upstream upstream-path=path learning-rate=lr3:
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e $RUN_DIR/best-states-dev.ckpt > $RUN_DIR/superb.ss.txt
-    cat $RUN_DIR/superb.ss.txt
+    python3 run_downstream.py -m evaluate -e $RUN_DIR/best-states-dev.ckpt > $RUN_DIR/evaluate.ss.txt
+    cat $RUN_DIR/evaluate.ss.txt
 
 speech-enhancement experiment-name upstream upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash

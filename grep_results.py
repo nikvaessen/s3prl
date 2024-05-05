@@ -18,7 +18,7 @@ def get_metric(
     out_file = (
         result_dir
         / task_name
-        / f"superb.{task_name if file_id is None else file_id}.txt"
+        / f"evaluate.{task_name if file_id is None else file_id}.txt"
     )
 
     if not out_file.exists():
@@ -157,23 +157,23 @@ def main(result_directory: pathlib.Path):
 
     # asr-ood
     asr_wer_es = get_metric(
-        result_directory, "asr-ood", "test wer", file_id="es.ood-asr"
+        result_directory, "asr-ood/es", "test wer", file_id="ood-asr.es"
     )
     asr_wer_ar = get_metric(
-        result_directory, "asr-ood", "test wer", file_id="ar.ood-asr"
+        result_directory, "asr-ood/ar", "test wer", file_id="ood-asr.ar"
     )
     asr_cer_zh = get_metric(
-        result_directory, "asr-ood", "test cer", file_id="zh-CN.ood-asr"
+        result_directory, "asr-ood/zh-CN", "test cer", file_id="ood-asr.zh-CN"
     )
     asr_wer_spoken = get_metric(
-        result_directory, "asr-ood", "test wer", file_id="sbcsae.ood-asr"
+        result_directory, "asr-ood/sbcsae", "test wer", file_id="ood-asr.sbcsae"
     )
 
     # ks
     ks_acc = get_metric(result_directory, "ks", "test acc")
 
     # qbe
-    qbe_mtwv = get_qbe_mtwv(result_directory)
+    qbe_mtwv = -1 # get_qbe_mtwv(result_directory)
 
     # sid
     sid_acc = get_metric(result_directory, "sid", "test acc")
@@ -184,7 +184,7 @@ def main(result_directory: pathlib.Path):
     )
 
     # sd
-    sd_der = get_der(result_directory / "sd" / "superb.sd.txt")
+    sd_der = get_der(result_directory / "sd" / "evaluate.sd.txt")
 
     # er
     er_acc = get_er_acc(result_directory)
