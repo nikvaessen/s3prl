@@ -487,9 +487,6 @@ class Runner():
                 print("breaking because of batch id!!!! WTF HELLO????")
                 break
 
-            if batch_id > 10:
-                break
-
             wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]
             with torch.no_grad():
                 features = self.upstream.model(wavs)
