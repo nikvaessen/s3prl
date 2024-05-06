@@ -385,7 +385,7 @@ speech-translation experiment-name upstream upstream-path=path learning-rate=lr3
     -p $RUN_DIR \
     -o \
     config.downstream_expert.datarc.num_workers={{num-workers}},,\
-    config.downstream_expert.generatorrc.beam=3,\
+    config.downstream_expert.generatorrc.beam=3,,\
     config.runner.fp16={{fp16}},,\
     config.optimizer.lr={{learning-rate}}
 
