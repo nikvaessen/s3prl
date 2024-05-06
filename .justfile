@@ -183,7 +183,7 @@ librimix:
     --part test {{superb-data-dir}}/librimix-ss s3prl/downstream/separation_stft2/datasets/Libri2Mix
 
     # setup dscore
-    git -C s3prl/downstream/diarization/dscore pull | git clone git@github.com:nikvaessen/dscore.git s3prl/downstream/diarization/dscore
+    git -C s3prl/downstream/diarization/dscore pull || git clone git@github.com:nikvaessen/dscore.git s3prl/downstream/diarization/dscore
 
 iemocap:
     #!/usr/bin/env bash
