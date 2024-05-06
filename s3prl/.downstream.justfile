@@ -6,6 +6,7 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 
 # common settings
 num-workers := "$(($(nproc)-1))"
+default-num-layer := 1
 fp16 := 'True'
 path := '/dev/null'
 
@@ -158,7 +159,7 @@ keyword-spotting experiment-name upstream upstream-path=path learning-rate=lr4:
 
     # write SLURM log files to $RUN_DIR
 
-query-by-example-spoken-term-detection experiment-name upstream upstream-path=path num-layer:
+query-by-example-spoken-term-detection experiment-name upstream upstream-path=path num-layer=default-num-layer:
     #!/usr/bin/env bash
     RUN_DIR={{exp-dir}}/{{experiment-name}}/qbe
     mkdir -p $RUN_DIR
