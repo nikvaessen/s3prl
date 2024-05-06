@@ -59,7 +59,7 @@ downstream_expert:
 
   # configuration of decoding
   generatorrc:
-    beam: 5
+    beam: 20
     max_len_a: 0
     max_len_b: 400
 
