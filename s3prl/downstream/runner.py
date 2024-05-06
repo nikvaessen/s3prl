@@ -389,6 +389,8 @@ class Runner():
                 # evaluation and save checkpoint
                 save_names = []
 
+                print()
+                print(global_step, self.config['runner']['eval_step'], global_step % self.config['runner']['eval_step'])
                 if global_step % self.config['runner']['eval_step'] == 0:
                     for split in self.config['runner']['eval_dataloaders']:
                         save_names += self.evaluate(split, logger, global_step)
@@ -480,7 +482,12 @@ class Runner():
         batch_ids = []
         records = defaultdict(list)
         for batch_id, (wavs, *others) in enumerate(tqdm(dataloader, dynamic_ncols=True, desc=split, total=evaluate_steps)):
+            print(batch_id, evaluate_steps)
             if batch_id > evaluate_steps:
+                print("breaking because of batch id!!!! WTF HELLO????")
+                break
+
+            if batch_id > 10:
                 break
 
             wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]

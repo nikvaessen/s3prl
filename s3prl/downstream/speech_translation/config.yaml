@@ -3,9 +3,9 @@ runner:
   gradient_clipping: 10
   gradient_accumulate_steps: 8
 
-  log_step: 100
-  eval_step: 2000
-  save_step: 250
+  log_step: 10
+  eval_step: 20
+  save_step: 25
   max_keep: 1
   eval_dataloaders:
     - dev
