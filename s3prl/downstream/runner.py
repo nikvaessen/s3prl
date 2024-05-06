@@ -393,7 +393,8 @@ class Runner():
                 print(global_step, self.config['runner']['eval_step'], global_step % self.config['runner']['eval_step'])
                 if global_step % self.config['runner']['eval_step'] == 0:
                     for split in self.config['runner']['eval_dataloaders']:
-                        save_names += self.evaluate(split, logger, global_step)
+                        with torch.cuda.amp.autocast(enabled=amp):
+                            save_names += self.evaluate(split, logger, global_step)
 
                     if nan_or_oom_count > 100:
                         stop_training_after_eval = True
@@ -481,8 +482,13 @@ class Runner():
 
         batch_ids = []
         records = defaultdict(list)
+        utt_id_count = defaultdict(lambda : 0)
         for batch_id, (wavs, *others) in enumerate(tqdm(dataloader, dynamic_ncols=True, desc=split, total=evaluate_steps)):
             print(batch_id, evaluate_steps)
+
+            for utt_id in others[0]['utt_id']:
+                utt_id_count[utt_id] += 1
+
             if batch_id > evaluate_steps:
                 print("breaking because of batch id!!!! WTF HELLO????")
                 break
@@ -498,6 +504,13 @@ class Runner():
                     batch_id = batch_id,
                 )
                 batch_ids.append(batch_id)
+
+        print("all IDS more than once...")
+        for k, v in utt_id_count.items():
+            if v >= 1:
+                print(k, v)
+
+        print("above are all counts more than once!")
 
         save_names = self.downstream.model.log_records(
             split,
