@@ -475,7 +475,7 @@ class Runner():
 
         # prepare data
         if not self.config['runner'].get('cache_eval_dataloaders', True):
-            print(f'rest LRU cache of {split} dataloader')
+            print(f'LRU cache of {split} dataloader has been reset')
             self._get_dataloader.cache_clear()
 
         dataloader = self._get_dataloader(split)

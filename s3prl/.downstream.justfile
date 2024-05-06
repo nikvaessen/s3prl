@@ -6,7 +6,6 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 
 # common settings
 num-workers := "$(($(nproc)-1))"
-default-num-layers := "12"
 fp16 := 'True'
 path := '/dev/null'
 
@@ -159,7 +158,7 @@ keyword-spotting experiment-name upstream upstream-path=path learning-rate=lr4:
 
     # write SLURM log files to $RUN_DIR
 
-query-by-example-spoken-term-detection experiment-name upstream upstream-path=path num-layers=default-num-layers:
+query-by-example-spoken-term-detection experiment-name upstream upstream-path=path num-layer:
     #!/usr/bin/env bash
     RUN_DIR={{exp-dir}}/{{experiment-name}}/qbe
     mkdir -p $RUN_DIR
@@ -169,45 +168,41 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
     # predicting
-    for layer in $(seq 1 {{num-layers}}); do
-        echo "layer: $layer with {{num-workers}} workers"
+    echo "layer: $layer with {{num-workers}} workers"
 
-        # dev
-        python3 run_downstream.py \
-        -d quesst14_dtw \
-        -m evaluate -u {{upstream}} -k {{upstream-path}} \
-        -t "dev" \
-        -l ${layer} \
-        -p $RUN_DIR/exp_${layer}_dev \
-        -o \
-        "config.downstream_expert.dtwrc.dist_method=cosine,,\
-        config.downstream_expert.max_workers={{num-workers}},,\
-        config.downstream_expert.datarc.num_workers={{num-workers}},,\
-        config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
+    # dev
+    python3 run_downstream.py \
+    -d quesst14_dtw \
+    -m evaluate -u {{upstream}} -k {{upstream-path}} \
+    -t "dev" \
+    -l ${layer} \
+    -p $RUN_DIR/exp_${layer}_dev \
+    -o \
+    "config.downstream_expert.dtwrc.dist_method=cosine,,\
+    config.downstream_expert.max_workers={{num-workers}},,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
+    config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
 
-        # test
-        python3 run_downstream.py \
-        -d quesst14_dtw \
-        -m evaluate -u {{upstream}} -k {{upstream-path}} \
-        -t "test" \
-        -l ${layer} \
-        -p $RUN_DIR/exp_${layer}_test \
-        -o \
-        "config.downstream_expert.dtwrc.dist_method=cosine,,\
-        config.downstream_expert.max_workers={{num-workers}},,\
-        config.downstream_expert.datarc.num_workers={{num-workers}},,\
-        config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
-    done
+    # test
+    python3 run_downstream.py \
+    -d quesst14_dtw \
+    -m evaluate -u {{upstream}} -k {{upstream-path}} \
+    -t "test" \
+    -l ${layer} \
+    -p $RUN_DIR/exp_${layer}_test \
+    -o \
+    "config.downstream_expert.dtwrc.dist_method=cosine,,\
+    config.downstream_expert.max_workers={{num-workers}},,\
+    config.downstream_expert.datarc.num_workers={{num-workers}},,\
+    config.downstream_expert.datarc.dataset_root={{data-dir}}/quesst14"
 
     # scoring
     cd {{data-dir}}/quesst14/scoring/
-    for layer in $(seq 1 {{num-layers}}); do
-        # dev
-        ./score-TWV-Cnxe.sh RUN_DIR//exp_${layer}_dev groundtruth_quesst14_dev -10
+    # dev
+    ./score-TWV-Cnxe.sh RUN_DIR//exp_${layer}_dev groundtruth_quesst14_dev -10
 
-        # test
-        ./score-TWV-Cnxe.sh $RUN_DIR/exp_${layer}_test groundtruth_quesst14_eval -10
-     done
+    # test
+    ./score-TWV-Cnxe.sh $RUN_DIR/exp_${layer}_test groundtruth_quesst14_eval -10
 
 speaker-identificaton experiment-name upstream upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash

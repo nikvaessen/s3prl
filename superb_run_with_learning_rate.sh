@@ -1,13 +1,39 @@
 #!/usr/bin/env bash
+set -e
+
+# check cmd arguments are given
+if [ -z "$1" ]; then
+    echo 'please provide "$NAME" in $1'
+    exit 1
+fi
+if [ -z "$2" ]; then
+    echo 'please provide "$UPSTREAM" in $2'
+    exit 1
+fi
+if [ -z "$3" ]; then
+    echo 'please provide "$UPSTREAM_PATH" in $3'
+    exit 1
+fi
 
 # set arguments
 NAME="$1"
 UPSTREAM="$2"
 UPSTREAM_PATH="$3"
 
-if [ -n "$4" ]; then
+# default LR if not given
+if [[ -n "$4" ]]; then
     LR=$4
+    echo "using learning rate $LR"
+else
+    echo "using default learning rate"
 fi
+
+# set path to out and err file
+export SLURM_OUT_FILE=$PWD/slurm-"$SLURM_ARRAY_JOB_ID"-"$SLURM_ARRAY_TASK_ID".out
+export SLURM_ERR_FILE=$PWD/slurm-"$SLURM_ARRAY_JOB_ID"-"$SLURM_ARRAY_TASK_ID".err
+
+# activate virtual environment
+source .venv/bin/activate
 
 case $SLURM_ARRAY_TASK_ID in
     0)
@@ -226,7 +252,6 @@ case $SLURM_ARRAY_TASK_ID in
             just downstream::speech-enhancement "$NAME" "$UPSTREAM" "$UPSTREAM_PATH"
         fi
         ;;
-
     *)
         echo "No command specified for task ID $SLURM_ARRAY_TASK_ID"
         ;;
