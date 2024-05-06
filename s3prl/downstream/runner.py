@@ -389,8 +389,6 @@ class Runner():
                 # evaluation and save checkpoint
                 save_names = []
 
-                print()
-                print(global_step, self.config['runner']['eval_step'], global_step % self.config['runner']['eval_step'])
                 if global_step % self.config['runner']['eval_step'] == 0:
                     for split in self.config['runner']['eval_dataloaders']:
                         with torch.cuda.amp.autocast(enabled=amp):
@@ -477,6 +475,7 @@ class Runner():
 
         # prepare data
         if not self.config['runner'].get('cache_eval_dataloaders', True):
+            print(f'rest LRU cache of {split} dataloader')
             self._get_dataloader.cache_clear()
 
         dataloader = self._get_dataloader(split)
@@ -486,17 +485,8 @@ class Runner():
 
         batch_ids = []
         records = defaultdict(list)
-        utt_id_count = defaultdict(lambda : 0)
+
         for batch_id, (wavs, *others) in enumerate(tqdm(dataloader, dynamic_ncols=True, desc=split, total=evaluate_steps)):
-            print(batch_id, evaluate_steps)
-
-            for utt_id in others[0]['utt_id']:
-                utt_id_count[utt_id] += 1
-
-            if batch_id > evaluate_steps:
-                print("breaking because of batch id!!!! WTF HELLO????")
-                break
-
             wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]
             with torch.no_grad():
                 features = self.upstream.model(wavs)
@@ -508,13 +498,6 @@ class Runner():
                     batch_id = batch_id,
                 )
                 batch_ids.append(batch_id)
-
-        print("all IDS more than once...")
-        for k, v in utt_id_count.items():
-            if v > 1:
-                print(k, v)
-
-        print("above are all counts more than once!")
 
         save_names = self.downstream.model.log_records(
             split,
