@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=superb
+#SBATCH --job-name=superb-qbe
 #SBATCH --output=slurm-%A-%a.out
 #SBATCH --error=slurm-%A-%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
