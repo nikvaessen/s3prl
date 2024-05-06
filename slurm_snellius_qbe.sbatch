@@ -3,7 +3,7 @@
 #SBATCH --output=slurm-%A-%a.out
 #SBATCH --error=slurm-%A-%a.err
 
-#SBATCH --array=1-12
+#SBATCH --array=0-12
 
 #SBATCH --partition=gpu
 

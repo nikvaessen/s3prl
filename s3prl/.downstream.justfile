@@ -169,15 +169,16 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     if [[ ! -z "${SLURM_ERR_FILE+x}" ]]; then ln -s $SLURM_ERR_FILE $RUN_DIR/$(basename $SLURM_ERR_FILE); fi
 
     # predicting
-    echo "layer: $layer with {{num-workers}} workers"
+    LAYER={{num-layer}}
+    echo "layer: $LAYER with {{num-workers}} workers"
 
     # dev
     python3 run_downstream.py \
     -d quesst14_dtw \
     -m evaluate -u {{upstream}} -k {{upstream-path}} \
     -t "dev" \
-    -l ${layer} \
-    -p $RUN_DIR/exp_${layer}_dev \
+    -l $LAYER \
+    -p $RUN_DIR/exp_"$LAYER"_dev \
     -o \
     "config.downstream_expert.dtwrc.dist_method=cosine,,\
     config.downstream_expert.max_workers={{num-workers}},,\
@@ -189,8 +190,8 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     -d quesst14_dtw \
     -m evaluate -u {{upstream}} -k {{upstream-path}} \
     -t "test" \
-    -l ${layer} \
-    -p $RUN_DIR/exp_${layer}_test \
+    -l $LAYER \
+    -p $RUN_DIR/exp_"$layer"_test \
     -o \
     "config.downstream_expert.dtwrc.dist_method=cosine,,\
     config.downstream_expert.max_workers={{num-workers}},,\
@@ -200,10 +201,10 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     # scoring
     cd {{data-dir}}/quesst14/scoring/
     # dev
-    ./score-TWV-Cnxe.sh RUN_DIR//exp_${layer}_dev groundtruth_quesst14_dev -10
+    ./score-TWV-Cnxe.sh RUN_DIR//exp_"$LAYER"_dev groundtruth_quesst14_dev -10
 
     # test
-    ./score-TWV-Cnxe.sh $RUN_DIR/exp_${layer}_test groundtruth_quesst14_eval -10
+    ./score-TWV-Cnxe.sh $RUN_DIR/exp_"$LAYER"_test groundtruth_quesst14_eval -10
 
 speaker-identificaton experiment-name upstream upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash

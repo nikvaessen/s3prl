@@ -4,7 +4,7 @@
 #SBATCH --error=slurm-%A-%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-#SBATCH --array=0-23
+#SBATCH --array=0-12
 
 #SBATCH --partition=icis
 #SBATCH --account=icis
