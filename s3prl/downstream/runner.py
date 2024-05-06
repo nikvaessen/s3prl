@@ -391,7 +391,8 @@ class Runner():
 
                 if global_step % self.config['runner']['eval_step'] == 0:
                     for split in self.config['runner']['eval_dataloaders']:
-                        save_names += self.evaluate(split, logger, global_step)
+                        with torch.cuda.amp.autocast(enabled=amp):
+                            save_names += self.evaluate(split, logger, global_step)
 
                     if nan_or_oom_count > 100:
                         stop_training_after_eval = True
@@ -473,6 +474,10 @@ class Runner():
             entry.model.eval()
 
         # prepare data
+        if not self.config['runner'].get('cache_eval_dataloaders', True):
+            print(f'rest LRU cache of {split} dataloader')
+            self._get_dataloader.cache_clear()
+
         dataloader = self._get_dataloader(split)
         evaluate_ratio = float(self.config["runner"].get("evaluate_ratio", 1))
         evaluate_steps = round(len(dataloader) * evaluate_ratio)
