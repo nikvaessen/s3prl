@@ -476,7 +476,11 @@ class Runner():
             entry.model.eval()
 
         # prepare data
+        if not self.config['runner'].get('cache_eval_dataloaders', True):
+            self._get_dataloader.cache_clear()
+
         dataloader = self._get_dataloader(split)
+
         evaluate_ratio = float(self.config["runner"].get("evaluate_ratio", 1))
         evaluate_steps = round(len(dataloader) * evaluate_ratio)
 
@@ -507,7 +511,7 @@ class Runner():
 
         print("all IDS more than once...")
         for k, v in utt_id_count.items():
-            if v >= 1:
+            if v > 1:
                 print(k, v)
 
         print("above are all counts more than once!")

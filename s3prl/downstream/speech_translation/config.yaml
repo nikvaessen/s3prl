@@ -7,6 +7,7 @@ runner:
   eval_step: 20
   save_step: 25
   max_keep: 1
+  cache_eval_dataloaders: false
   eval_dataloaders:
     - dev
     # - test
