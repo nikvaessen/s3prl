@@ -6,7 +6,7 @@ exp-dir  := "${SUPERB_EXPERIMENTS}"
 
 # common settings
 num-workers := "$(($(nproc)-1))"
-default-num-layer := 1
+default-num-layer := "1"
 fp16 := 'True'
 path := '/dev/null'
 
