@@ -33,9 +33,8 @@ def get_metric(
         if len(potential_result_files) == 1:
             result_file = potential_result_files[0]
         else:
-            raise ValueError(
-                f"could not select result file from {potential_result_files=}"
-            )
+            warnings.warn(f"could not find 'evaluate.*.txt' in directory {task_dir}")
+            return -1
     elif custom_filename is None:
         result_file = task_dir / f"evaluate.{task_name}.txt"
     else:
