@@ -7,6 +7,7 @@
 ########################################################################################
 import json
 import pathlib
+import re
 import warnings
 
 import click
@@ -54,7 +55,8 @@ def get_metric(
 
                 return value
 
-    raise ValueError(f"could not find line with '{metric_name}' for {result_file}")
+    warnings.warn(f"could not find line with '{metric_name}' for {result_file}")
+    return -1
 
 
 def get_learning_rate(task_dir: pathlib.Path):
@@ -77,13 +79,13 @@ def get_der(der_file: pathlib.Path):
     return float(der_score)
 
 
-def get_qbe_mtwv(result_dir: pathlib.Path):
+def get_qbe_mtwv(task_dir: pathlib.Path):
     dev_dirs = sorted(
-        [d for d in (result_dir / "qbe").iterdir() if d.is_dir() and "dev" in d.name],
+        [d for d in task_dir.iterdir() if d.is_dir() and "dev" in d.name],
         key=lambda d: d.name.split("_")[1],
     )
     test_dirs = sorted(
-        [d for d in (result_dir / "qbe").iterdir() if d.is_dir() and "test" in d.name],
+        [d for d in task_dir.iterdir() if d.is_dir() and "test" in d.name],
         key=lambda d: d.name.split("_")[1],
     )
 
@@ -105,10 +107,11 @@ def get_qbe_mtwv(result_dir: pathlib.Path):
     best_layer = -1
     best_mtwv = -1
 
+    print("layer scores for QbE")
     for idx, dev_dir in enumerate(dev_dirs):
         score_file = dev_dir / "score.out"
         score = _get_score(score_file)
-
+        print(f"layer {idx} {score=}")
         if score > best_mtwv:
             best_layer = idx
             best_mtwv = score
@@ -127,8 +130,15 @@ def get_er_acc_and_lr(subdir: pathlib.Path):
         acc = get_metric(fold_dir, "test acc")
         accuracy_list.append(acc)
 
+        if acc == -1:
+            continue
+
         lr = get_learning_rate(fold_dir)
         lr_list.append(lr)
+
+    if len(accuracy_list) == 0:
+        warnings.warn("all folds for emotion recognition failed")
+        return -1
 
     cv_acc = sum(accuracy_list) / len(accuracy_list)
     assert all(lr_list[0] == lr_list[idx] for idx in range(len(lr_list)))
@@ -185,9 +195,19 @@ def get_vc_metrics(result_dir: pathlib.Path):
 
 @click.command()
 @click.argument("result_directory", type=pathlib.Path)
-@click.option("--name", required=True, type=str)
+@click.option("--name", required=False, type=str, default=None)
 def main(result_directory: pathlib.Path, name: str):
     output_json = []
+
+    if name is None:
+        name = result_directory.name
+
+        pattern_qbe = r"(.+?)-qbe$"
+        pattern_se = r"-?\d+\.?\d*e[+-]?\d+"
+        name = re.sub(pattern_qbe, r"\1", name)
+        name = re.sub(pattern_se, "", name)
+
+        print(f"selected {name=} for directory {result_directory}")
 
     for subdir in sorted([d for d in result_directory.iterdir() if d.is_dir()]):
         if subdir.name == "asr":
