@@ -155,12 +155,21 @@ def get_downstream_args():
 def main():
     logging.basicConfig(level=logging.INFO)
 
+    if "SUPERB_MP_START_METHOD" in os.environ:
+        start_method = os.environ["SUPERB_MP_START_METHOD"]
+        torch.multiprocessing.set_start_method(start_method)
+        print(f"set multiprocessing start method to {start_method}")
+    if "SUPERB_MP_SHARING_STRATEGY" in os.environ:
+        sharing_strategy = os.environ["SUPERB_MP_SHARING_STRATEGY"]
+        torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+        print(f'set multiprocessing sharing strategy to {sharing_strategy}')
+
     # torch.multiprocessing.set_sharing_strategy('file_system')
     # torch.multiprocessing.set_start_method('spawn')
     # torch.set_num_threads(1)
     # torchaudio.set_audio_backend('sox_io')
-    # hack_isinstance()
-    #time.sleep(random.randint(1, 60))
+    # time.sleep(random.randint(1, 60))
+    hack_isinstance()
 
     # get config and arguments
     args, config, backup_files = get_downstream_args()

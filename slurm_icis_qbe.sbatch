@@ -15,5 +15,9 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=2:00:00
 
+# set multiprocessing settings
+export SUPERB_MP_START_METHOD='spawn'
+export SUPERB_MP_SHARING_STRATEGY='file_descriptor'
+
 # run superb benchmark
 bash superb_run_qbe.sh "$@" "$SLURM_ARRAY_TASK_ID"
