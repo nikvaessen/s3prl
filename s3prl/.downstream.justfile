@@ -288,7 +288,7 @@ speaker-diarization experiment-name upstream upstream-path=path learning-rate=lr
 
 emotion-recognition experiment-name upstream fold upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash
-    RUN_DIR={{exp-dir}}/{{experiment-name}}/er
+    RUN_DIR={{exp-dir}}/{{experiment-name}}/er/{{fold}}
     mkdir -p $RUN_DIR
     echo "learning rate: {{learning-rate}}" > $RUN_DIR/learning_rate.txt
 
@@ -300,7 +300,7 @@ emotion-recognition experiment-name upstream fold upstream-path=path learning-ra
     python3 run_downstream.py \
     -d emotion -a \
     -m train -u {{upstream}} -k {{upstream-path}} \
-    -p $RUN_DIR/{{fold}} \
+    -p $RUN_DIR \
     -c downstream/emotion/config.yaml \
     -o \
     config.downstream_expert.datarc.test_fold={{fold}},,\
@@ -310,8 +310,8 @@ emotion-recognition experiment-name upstream fold upstream-path=path learning-ra
     config.optimizer.lr={{learning-rate}}
 
     # test
-    python3 run_downstream.py -m evaluate -e $RUN_DIR/{{fold}}/dev-best.ckpt > $RUN_DIR/{{fold}}/evaluate.er.txt
-    cat $RUN_DIR/{{fold}}/evaluate.er.txt
+    python3 run_downstream.py -m evaluate -e $RUN_DIR/dev-best.ckpt > $RUN_DIR/evaluate.er.txt
+    cat $RUN_DIR/evaluate.er.txt
 
 intent-classification experiment-name upstream upstream-path=path learning-rate=lr4:
     #!/usr/bin/env bash
