@@ -1,33 +1,50 @@
 #!/usr/bin/env python3
+########################################################################################
+#
+# Scripts to collect all results from a SUPERB slurm run.
+#
+# Author(s): Nik Vaessen
+########################################################################################
+
 import pathlib
 import warnings
-from typing import Optional
 
 import click
 
+########################################################################################
+# function grabbing results from task directory
+
 
 def get_metric(
-    result_dir: pathlib.Path,
-    task_name: str,
-    line_id: str,
+    task_dir: pathlib.Path,
+    metric_name: str,
     make_percentage: bool = True,
-    file_id: Optional[str] = None,
     split_token: str = ":",
     split_idx: int = 1,
+    task_name: str = None,
+    custom_filename: str = None,
 ):
-    out_file = (
-        result_dir
-        / task_name
-        / f"evaluate.{task_name if file_id is None else file_id}.txt"
-    )
+    if task_name is None and custom_filename is None:
+        potential_result_files = [*task_dir.glob("evaluate.*.txt")]
 
-    if not out_file.exists():
-        warnings.warn(f"{out_file} does not exist!")
+        if len(potential_result_files) == 1:
+            result_file = potential_result_files[0]
+        else:
+            raise ValueError(
+                f"could not select result file from {potential_result_files=}"
+            )
+    elif custom_filename is None:
+        result_file = task_dir / f"evaluate.{task_name}.txt"
+    else:
+        result_file = task_dir / custom_filename
+
+    if not result_file.exists():
+        warnings.warn(f"{result_file} does not exist!")
         return -1
 
-    with out_file.open("r") as f:
+    with result_file.open("r") as f:
         for ln in f.readlines():
-            if line_id in ln:
+            if metric_name in ln:
                 value = float(ln.strip().split(split_token)[split_idx].strip())
 
                 if make_percentage:
@@ -35,7 +52,16 @@ def get_metric(
 
                 return value
 
-    raise ValueError(f"could not find line with '{line_id}' for {out_file}")
+    raise ValueError(f"could not find line with '{metric_name}' for {result_file}")
+
+
+def get_learning_rate(task_dir: pathlib.Path):
+    return get_metric(
+        task_dir,
+        metric_name="learning rate",
+        custom_filename="learning_rate.txt",
+        make_percentage=False,
+    )
 
 
 def get_der(der_file: pathlib.Path):
@@ -90,13 +116,23 @@ def get_qbe_mtwv(result_dir: pathlib.Path):
     return test_score
 
 
-def get_er_acc(result_dir: pathlib.Path):
+def get_er_acc_and_lr(subdir: pathlib.Path):
     accuracy_list = []
+    lr_list = []
+
     for fold_idx in range(1, 6):
-        acc = get_metric(result_dir, f"er/fold{fold_idx}", "test acc", file_id="er")
+        fold_dir = subdir / f"fold{fold_idx}"
+        acc = get_metric(fold_dir, "test acc")
         accuracy_list.append(acc)
 
-    return sum(accuracy_list) / len(accuracy_list)
+        lr = get_learning_rate(fold_dir)
+        lr_list.append(lr)
+
+    cv_acc = sum(accuracy_list) / len(accuracy_list)
+    assert all(lr_list[0] == lr_list[idx] for idx in range(len(lr_list)))
+    cv_lr = lr_list[0]
+
+    return cv_acc, cv_lr
 
 
 def get_vc_metrics(result_dir: pathlib.Path):
@@ -109,7 +145,7 @@ def get_vc_metrics(result_dir: pathlib.Path):
             get_metric(
                 result_dir,
                 f"vc/{spk}",
-                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                metric_name="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
                 split_token=" ",
                 split_idx=9,
                 file_id=f"vc.{spk}",
@@ -120,7 +156,7 @@ def get_vc_metrics(result_dir: pathlib.Path):
             get_metric(
                 result_dir,
                 f"vc/{spk}",
-                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                metric_name="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
                 split_token=" ",
                 split_idx=14,
                 file_id=f"vc.{spk}",
@@ -131,7 +167,7 @@ def get_vc_metrics(result_dir: pathlib.Path):
             get_metric(
                 result_dir,
                 f"vc/{spk}",
-                line_id="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
+                metric_name="Mean MCD, f0RMSE, f0CORR, DDUR, CER, WER",
                 split_token=" ",
                 split_idx=15,
                 file_id=f"vc.{spk}",
@@ -148,201 +184,390 @@ def get_vc_metrics(result_dir: pathlib.Path):
 
 @click.command()
 @click.argument("result_directory", type=pathlib.Path)
-def main(result_directory: pathlib.Path):
-    # pr
-    pr_per = get_metric(result_directory, "pr", "test per")
+@click.option("--name", required=True, type=str)
+def main(result_directory: pathlib.Path, name: str):
+    output_json = []
 
-    # asr
-    asr_wer = get_metric(result_directory, "asr", "test-clean wer", False)
+    for subdir in sorted([d for d in result_directory.iterdir() if d.is_dir()]):
+        if subdir.name == "asr":
+            asr_wer = get_metric(subdir, "test-clean wer", False)
+            lr = get_learning_rate(subdir)
 
-    # asr-ood
-    asr_wer_es = get_metric(
-        result_directory, "asr-ood/es", "test wer", file_id="ood-asr.es"
-    )
-    asr_wer_ar = get_metric(
-        result_directory, "asr-ood/ar", "test wer", file_id="ood-asr.ar"
-    )
-    asr_cer_zh = get_metric(
-        result_directory, "asr-ood/zh-CN", "test cer", file_id="ood-asr.zh-CN"
-    )
-    asr_wer_spoken = get_metric(
-        result_directory, "asr-ood/sbcsae", "test wer", file_id="ood-asr.sbcsae"
-    )
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "wer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asr_wer,
+                }
+            )
 
-    # ks
-    ks_acc = get_metric(result_directory, "ks", "test acc")
+        elif subdir.name == "asr-ood":
+            asr_wer_es = get_metric(subdir / "es", "test wer")
+            lr_es = get_learning_rate(subdir / "es")
 
-    # qbe
-    qbe_mtwv = -1 # get_qbe_mtwv(result_directory)
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name + "-es",
+                    "learning-rate": lr_es,
+                    "metric": "wer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asr_wer_es,
+                }
+            )
 
-    # sid
-    sid_acc = get_metric(result_directory, "sid", "test acc")
+            asr_wer_ar = get_metric(subdir / "ar", "test wer")
+            lr_ar = get_learning_rate(subdir / "ar")
 
-    # asv
-    asv_eer = get_metric(
-        result_directory, "asv", "achieves EER", split_token=" ", split_idx=5
-    )
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name + "-ar",
+                    "learning-rate": lr_ar,
+                    "metric": "wer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asr_wer_ar,
+                }
+            )
 
-    # sd
-    sd_der = get_der(result_directory / "sd" / "evaluate.sd.txt")
+            asr_cer_zh = get_metric(subdir / "zh-CN", "test cer")
+            lr_zh = get_learning_rate(subdir / "zh-CN")
 
-    # er
-    er_acc = get_er_acc(result_directory)
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name + "-zh",
+                    "learning-rate": lr_zh,
+                    "metric": "cer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asr_cer_zh,
+                }
+            )
 
-    # ic
-    ic_acc = get_metric(result_directory, "ic", "test acc")
+            asr_wer_spoken = get_metric(subdir / "sbcsae", "test wer")
+            lr_spoken = get_learning_rate(subdir / "sbcsae")
 
-    # slot filling
-    sf_f0 = get_metric(result_directory, "sf", "slot_type_f1")
-    sf_cer = get_metric(result_directory, "sf", "slot_value_cer")
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name + "-spoken",
+                    "learning-rate": lr_spoken,
+                    "metric": "wer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asr_wer_spoken,
+                }
+            )
 
-    # st
-    st_bleu = get_metric(
-        result_directory,
-        "st",
-        "BLEU =",
-        split_token=" ",
-        split_idx=2,
-        make_percentage=False,
-    )
+        elif subdir.name == "asv":
+            asv_eer = get_metric(subdir, "achieves EER", split_token=" ", split_idx=5)
+            lr = get_learning_rate(subdir)
 
-    # vc
-    vc_mcd, vc_wer, vc_asv_ar = get_vc_metrics(result_directory)
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "eer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": asv_eer,
+                }
+            )
 
-    # se
-    se_pesq = get_metric(
-        result_directory,
-        "se",
-        "Average pesq",
-        split_token=" ",
-        split_idx=6,
-        make_percentage=False,
-    )
-    se_stoi = get_metric(
-        result_directory,
-        "se",
-        "Average stoi",
-        split_token=" ",
-        split_idx=6,
-        make_percentage=True,
-    )
+        elif subdir.name == "er":
+            er_acc, lr = get_er_acc_and_lr(subdir)
 
-    # ss
-    ss_si_sdri = get_metric(
-        result_directory,
-        "ss",
-        "si_sdr",
-        split_token=" ",
-        split_idx=5,
-        make_percentage=False,
-    )
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "acc",
+                    "metric-is-better-when": "higher",
+                    "metric-value": er_acc,
+                }
+            )
 
-    # write csv
-    with open(result_directory / "results.csv", "w") as f:
-        # header
-        print("pr", file=f, end=",")
-        print("asr", file=f, end=",")
-        print("asr-ood-es", file=f, end=",")
-        print("asr-ood-ar", file=f, end=",")
-        print("asr-ood-zh-CN", file=f, end=",")
-        print("asr-ood-spoken", file=f, end=",")
-        print("ks", file=f, end=",")
-        print("qbe", file=f, end=",")
-        print("sid", file=f, end=",")
-        print("asv", file=f, end=",")
-        print("sd", file=f, end=",")
-        print("er", file=f, end=",")
-        print("ic", file=f, end=",")
-        print("sf-f0", file=f, end=",")
-        print("sf-cer", file=f, end=",")
-        print("st", file=f, end=",")
-        print("vc-mcd", file=f, end=",")
-        print("vc-wer", file=f, end=",")
-        print("vc-asv-ar", file=f, end=",")
-        print("se-pesq", file=f, end=",")
-        print("se-stoi", file=f, end=",")
-        print("ss", file=f, end="\n")
+        elif subdir.name == "ic":
+            ic_acc = get_metric(subdir, "test acc")
+            lr = get_learning_rate(subdir)
 
-        # results
-        print(pr_per, file=f, end=",")
-        print(asr_wer, file=f, end=",")
-        print(asr_wer_es, file=f, end=",")
-        print(asr_wer_ar, file=f, end=",")
-        print(asr_cer_zh, file=f, end=",")
-        print(asr_wer_spoken, file=f, end=",")
-        print(ks_acc, file=f, end=",")
-        print(qbe_mtwv, file=f, end=",")
-        print(sid_acc, file=f, end=",")
-        print(asv_eer, file=f, end=",")
-        print(sd_der, file=f, end=",")
-        print(er_acc, file=f, end=",")
-        print(ic_acc, file=f, end=",")
-        print(sf_f0, file=f, end=",")
-        print(sf_cer, file=f, end=",")
-        print(st_bleu, file=f, end=",")
-        print(vc_mcd, file=f, end=",")
-        print(vc_wer, file=f, end=",")
-        print(vc_asv_ar, file=f, end=",")
-        print(se_pesq, file=f, end=",")
-        print(se_stoi, file=f, end=",")
-        print(ss_si_sdri, file=f, end="\n")
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "acc",
+                    "metric-is-better-when": "higher",
+                    "metric-value": ic_acc,
+                }
+            )
 
-    with open(result_directory / "results.drive.txt", "w") as f:
-        # results
-        print(pr_per, file=f)
-        print(asr_wer, file=f)
-        print(asr_wer_es, file=f)
-        print(asr_wer_ar, file=f)
-        print(asr_cer_zh, file=f)
-        print(asr_wer_spoken, file=f)
-        print(ks_acc, file=f)
-        print(qbe_mtwv, file=f)
-        print(file=f)
-        print(sid_acc, file=f)
-        print(asv_eer, file=f)
-        print(sd_der, file=f)
-        print(file=f)
-        print(er_acc, file=f)
-        print(file=f)
-        print(ic_acc, file=f)
-        print(sf_f0, file=f)
-        print(sf_cer, file=f)
-        print(st_bleu, file=f)
-        print(file=f)
-        print(vc_mcd, file=f)
-        print(vc_wer, file=f)
-        print(vc_asv_ar, file=f)
-        print(se_pesq, file=f)
-        print(se_stoi, file=f)
-        print(ss_si_sdri, file=f)
+        elif subdir.name == "ks":
+            ks_acc = get_metric(subdir, "test acc")
+            lr = get_learning_rate(subdir)
 
-    with open(result_directory / "results.txt", "w") as f:
-        # results
-        print(f"{pr_per=:.2f}", file=f)
-        print(f"{asr_wer=:.2f}", file=f)
-        print(f"{asr_wer_es=:.2f}", file=f)
-        print(f"{asr_wer_ar=:.2f}", file=f)
-        print(f"{asr_cer_zh=:.2f}", file=f)
-        print(f"{asr_wer_spoken=:.2f}", file=f)
-        print(f"{ks_acc=:.2f}", file=f)
-        print(f"{qbe_mtwv=:.2f}", file=f)
-        print(f"{sid_acc=:.2f}", file=f)
-        print(f"{asv_eer=:.2f}", file=f)
-        print(f"{sd_der=:.2f}", file=f)
-        print(f"{er_acc=:.2f}", file=f)
-        print(f"{ic_acc=:.2f}", file=f)
-        print(f"{sf_f0=:.2f}", file=f)
-        print(f"{sf_cer=:.2f}", file=f)
-        print(f"{st_bleu=:.2f}", file=f)
-        print(f"{vc_mcd=:.2f}", file=f)
-        print(f"{vc_wer=:.2f}", file=f)
-        print(f"{vc_asv_ar=:.2f}", file=f)
-        print(f"{se_pesq=:.2f}", file=f)
-        print(f"{se_stoi=:.2f}", file=f)
-        print(f"{ss_si_sdri=:.2f}", file=f)
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "acc",
+                    "metric-is-better-when": "higher",
+                    "metric-value": ks_acc,
+                }
+            )
 
-    with open(result_directory / "results.txt", "r") as f:
-        print(f.read(), end="")
+        elif subdir.name == "pr":
+            pr_per = get_metric(subdir, "test per")
+            lr = get_learning_rate(subdir)
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "per",
+                    "metric-is-better-when": "lower",
+                    "metric-value": pr_per,
+                }
+            )
+
+        elif subdir.name == "sd":
+            sd_der = get_der(subdir / "evaluate.sd.txt")
+            lr = get_learning_rate(subdir)
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "der",
+                    "metric-is-better-when": "lower",
+                    "metric-value": sd_der,
+                }
+            )
+
+        elif subdir.name == "se":
+            se_pesq = get_metric(
+                subdir,
+                "Average pesq",
+                split_token=" ",
+                split_idx=6,
+                make_percentage=False,
+            )
+            se_stoi = get_metric(
+                subdir,
+                "Average stoi",
+                split_token=" ",
+                split_idx=6,
+                make_percentage=True,
+            )
+            lr = get_learning_rate(subdir)
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "pesq",
+                    "metric-is-better-when": "higher",
+                    "metric-value": se_pesq,
+                }
+            )
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "stoi",
+                    "metric-is-better-when": "higher",
+                    "metric-value": se_stoi,
+                }
+            )
+
+        elif subdir.name == "sf":
+            sf_f1 = get_metric(subdir, "slot_type_f1")
+            sf_cer = get_metric(subdir, "slot_value_cer")
+            lr = get_learning_rate(subdir)
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "f1",
+                    "metric-is-better-when": "higher",
+                    "metric-value": sf_f1,
+                }
+            )
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "cer",
+                    "metric-is-better-when": "lower",
+                    "metric-value": sf_cer,
+                }
+            )
+
+        elif subdir.name == "sid":
+            sid_acc = get_metric(subdir, "test acc")
+            lr = get_learning_rate(subdir)
+
+            output_json.append(
+                {
+                    "checkpoint": name,
+                    "superb_task": subdir.name,
+                    "learning-rate": lr,
+                    "metric": "acc",
+                    "metric-is-better-when": "higher",
+                    "metric-value": sid_acc,
+                }
+            )
+
+        elif subdir.name == "st":
+            pass
+
+        elif subdir.name == "ss":
+            pass
+
+        elif subdir.name == "vc":
+            pass
+
+        else:
+            print(f"skipping {subdir} as {subdir.name} is an unknown task")
+
+    for jsn in output_json:
+        print(jsn)
+
+    # # qbe
+    # qbe_mtwv = -1  # get_qbe_mtwv(result_directory)
+    #
+
+    # # st
+    # st_bleu = get_metric(
+    #     result_directory,
+    #     "st",
+    #     "BLEU =",
+    #     split_token=" ",
+    #     split_idx=2,
+    #     make_percentage=False,
+    # )
+
+    # # vc
+    # vc_mcd, vc_wer, vc_asv_ar = get_vc_metrics(result_directory)
+
+    # # write csv
+    # with open(result_directory / "results.csv", "w") as f:
+    #     # header
+    #     print("pr", file=f, end=",")
+    #     print("asr", file=f, end=",")
+    #     print("asr-ood-es", file=f, end=",")
+    #     print("asr-ood-ar", file=f, end=",")
+    #     print("asr-ood-zh-CN", file=f, end=",")
+    #     print("asr-ood-spoken", file=f, end=",")
+    #     print("ks", file=f, end=",")
+    #     print("qbe", file=f, end=",")
+    #     print("sid", file=f, end=",")
+    #     print("asv", file=f, end=",")
+    #     print("sd", file=f, end=",")
+    #     print("er", file=f, end=",")
+    #     print("ic", file=f, end=",")
+    #     print("sf-f0", file=f, end=",")
+    #     print("sf-cer", file=f, end=",")
+    #     print("st", file=f, end=",")
+    #     print("vc-mcd", file=f, end=",")
+    #     print("vc-wer", file=f, end=",")
+    #     print("vc-asv-ar", file=f, end=",")
+    #     print("se-pesq", file=f, end=",")
+    #     print("se-stoi", file=f, end=",")
+    #     print("ss", file=f, end="\n")
+    #
+    #     # results
+    #     print(pr_per, file=f, end=",")
+    #     print(asr_wer, file=f, end=",")
+    #     print(asr_wer_es, file=f, end=",")
+    #     print(asr_wer_ar, file=f, end=",")
+    #     print(asr_cer_zh, file=f, end=",")
+    #     print(asr_wer_spoken, file=f, end=",")
+    #     print(ks_acc, file=f, end=",")
+    #     print(qbe_mtwv, file=f, end=",")
+    #     print(sid_acc, file=f, end=",")
+    #     print(asv_eer, file=f, end=",")
+    #     print(sd_der, file=f, end=",")
+    #     print(er_acc, file=f, end=",")
+    #     print(ic_acc, file=f, end=",")
+    #     print(sf_f0, file=f, end=",")
+    #     print(sf_cer, file=f, end=",")
+    #     print(st_bleu, file=f, end=",")
+    #     print(vc_mcd, file=f, end=",")
+    #     print(vc_wer, file=f, end=",")
+    #     print(vc_asv_ar, file=f, end=",")
+    #     print(se_pesq, file=f, end=",")
+    #     print(se_stoi, file=f, end=",")
+    #     print(ss_si_sdri, file=f, end="\n")
+    #
+    # with open(result_directory / "results.drive.txt", "w") as f:
+    #     # results
+    #     print(pr_per, file=f)
+    #     print(asr_wer, file=f)
+    #     print(asr_wer_es, file=f)
+    #     print(asr_wer_ar, file=f)
+    #     print(asr_cer_zh, file=f)
+    #     print(asr_wer_spoken, file=f)
+    #     print(ks_acc, file=f)
+    #     print(qbe_mtwv, file=f)
+    #     print(file=f)
+    #     print(sid_acc, file=f)
+    #     print(asv_eer, file=f)
+    #     print(sd_der, file=f)
+    #     print(file=f)
+    #     print(er_acc, file=f)
+    #     print(file=f)
+    #     print(ic_acc, file=f)
+    #     print(sf_f0, file=f)
+    #     print(sf_cer, file=f)
+    #     print(st_bleu, file=f)
+    #     print(file=f)
+    #     print(vc_mcd, file=f)
+    #     print(vc_wer, file=f)
+    #     print(vc_asv_ar, file=f)
+    #     print(se_pesq, file=f)
+    #     print(se_stoi, file=f)
+    #     print(ss_si_sdri, file=f)
+    #
+    # with open(result_directory / "results.txt", "w") as f:
+    #     # results
+    #     print(f"{pr_per=:.2f}", file=f)
+    #     print(f"{asr_wer=:.2f}", file=f)
+    #     print(f"{asr_wer_es=:.2f}", file=f)
+    #     print(f"{asr_wer_ar=:.2f}", file=f)
+    #     print(f"{asr_cer_zh=:.2f}", file=f)
+    #     print(f"{asr_wer_spoken=:.2f}", file=f)
+    #     print(f"{ks_acc=:.2f}", file=f)
+    #     print(f"{qbe_mtwv=:.2f}", file=f)
+    #     print(f"{sid_acc=:.2f}", file=f)
+    #     print(f"{asv_eer=:.2f}", file=f)
+    #     print(f"{sd_der=:.2f}", file=f)
+    #     print(f"{er_acc=:.2f}", file=f)
+    #     print(f"{ic_acc=:.2f}", file=f)
+    #     print(f"{sf_f0=:.2f}", file=f)
+    #     print(f"{sf_cer=:.2f}", file=f)
+    #     print(f"{st_bleu=:.2f}", file=f)
+    #     print(f"{vc_mcd=:.2f}", file=f)
+    #     print(f"{vc_wer=:.2f}", file=f)
+    #     print(f"{vc_asv_ar=:.2f}", file=f)
+    #     print(f"{se_pesq=:.2f}", file=f)
+    #     print(f"{se_stoi=:.2f}", file=f)
+    #     print(f"{ss_si_sdri=:.2f}", file=f)
+    #
+    # with open(result_directory / "results.txt", "r") as f:
+    #     print(f.read(), end="")
 
 
 if __name__ == "__main__":
