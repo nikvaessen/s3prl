@@ -191,7 +191,7 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
     -m evaluate -u {{upstream}} -k {{upstream-path}} \
     -t "test" \
     -l $LAYER \
-    -p $RUN_DIR/exp_"$layer"_test \
+    -p $RUN_DIR/exp_"$LAYER"_test \
     -o \
     "config.downstream_expert.dtwrc.dist_method=cosine,,\
     config.downstream_expert.max_workers={{num-workers}},,\
