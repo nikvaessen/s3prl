@@ -8,7 +8,7 @@
 #SBATCH --partition=gpu
 
 #SBATCH --gres=gpu:1
-#SBATCH --time=48:00:00
+#SBATCH --time=2:00:00
 
 # load modules virtual environment
 source "$HOME"/bin/load-modules
