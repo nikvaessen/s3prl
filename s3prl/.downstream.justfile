@@ -200,8 +200,9 @@ query-by-example-spoken-term-detection experiment-name upstream upstream-path=pa
 
     # scoring
     cd {{data-dir}}/quesst14/scoring/
+
     # dev
-    ./score-TWV-Cnxe.sh RUN_DIR//exp_"$LAYER"_dev groundtruth_quesst14_dev -10
+    ./score-TWV-Cnxe.sh $RUN_DIR/exp_"$LAYER"_dev groundtruth_quesst14_dev -10
 
     # test
     ./score-TWV-Cnxe.sh $RUN_DIR/exp_"$LAYER"_test groundtruth_quesst14_eval -10
