@@ -73,15 +73,15 @@ def main():
         print(f"memory usage in iteration {idx+1} iteration of loop")
         print_memory_info()
 
-        if idx > 0 and idx % validation_every_x_iters == 0:
+        if (idx+1) % validation_every_x_iters == 0:
             print("starting 'validation' loop of 3 iterations")
             for i, _ in enumerate(
                 DataLoader(validation_set, batch_size=None, num_workers=num_workers)
             ):
-                print(f"memory usage in iteration {i} of validation loop")
+                print(f"memory usage in iteration {i+1} of validation loop")
                 print_memory_info()
 
-                if i > 3:
+                if i >= 2:
                     break
 
 
