@@ -12,9 +12,9 @@ def get_n_gb_of_memory(num_gb):
     # pretend to have x times 500 kb 'files'
     num_files = int(num_gb // 0.0005) + 1
     print(f'{num_files=}')
-    tensor = torch.randint(0, 10, (num_files, 500_000//64), device="cpu", dtype=torch.int64)
+    tensor = torch.randint(0, 10, (num_files, 500_000//8), device="cpu", dtype=torch.int64)
 
-    lst = [t.clone() for t in torch.split(tensor, num_files, dim=0)]
+    lst = [tensor[i, :].clone() for i in range(num_files)]
     del tensor
 
     return lst
