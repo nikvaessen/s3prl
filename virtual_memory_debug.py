@@ -10,7 +10,7 @@ from psutil._common import bytes2human
 def get_n_gb_of_memory(num_gb):
     # 1 int64 number is 64 bits / 8 bytes
     # pretend to have x times 5 mb 'files'
-    num_files = num_gb * 1000 // 5
+    num_files = num_gb // 0.005
     return torch.randint(0, 10, (num_files, 625000), device="cpu", dtype=torch.int64)
 
 
