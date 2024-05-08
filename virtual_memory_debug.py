@@ -14,10 +14,7 @@ def get_n_gb_of_memory(num_gb):
     print(f'{num_files=}')
     tensor = torch.randint(0, 10, (num_files, 500_000//8), device="cpu", dtype=torch.int64)
 
-    lst = [tensor[i, :].clone() for i in range(num_files)]
-    del tensor
-
-    return lst
+    return tensor
 
 
 def pprint_ntuple(nt):
@@ -30,15 +27,15 @@ def pprint_ntuple(nt):
 
 class VirtualMemoryDataset(IterableDataset):
     def __init__(self, gb):
-        self.tensor_lst = get_n_gb_of_memory(gb)
+        self.tensor = get_n_gb_of_memory(gb)
 
     def __len__(self):
-        return len(self.tensor_lst)
+        return self.tensor.shape[0]
 
     def __iter__(self):
         while True:
-            for i in range(len(self.tensor_lst)):
-                yield self.tensor_lst[i]
+            for i in range(len(self)):
+                yield self.tensor[i, :]
 
 
 def print_memory_info():
