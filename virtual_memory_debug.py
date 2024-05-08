@@ -75,14 +75,14 @@ def main():
     # simulate a machine learning algorithm
     print("starting 'train' loop")
     validation_every_x_iters = 5
-    for idx, _ in enumerate(DataLoader(train_set, batch_size=None, num_workers=num_workers)):
+    for idx, _ in enumerate(DataLoader(train_set, batch_size=64, num_workers=num_workers)):
         print(f"memory usage in iteration {idx+1} iteration of train loop")
         print_memory_info()
 
         if (idx+1) % validation_every_x_iters == 0:
             print("starting 'validation' loop of 3 iterations")
             for i, _ in enumerate(
-                DataLoader(validation_set, batch_size=None, num_workers=num_workers)
+                DataLoader(validation_set, batch_size=64, num_workers=num_workers)
             ):
                 print(f"memory usage in iteration {i+1} of validation loop")
                 print_memory_info()
