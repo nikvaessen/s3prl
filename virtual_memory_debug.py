@@ -9,9 +9,15 @@ from psutil._common import bytes2human
 
 def get_n_gb_of_memory(num_gb):
     # 1 int64 number is 64 bits / 8 bytes
-    # pretend to have x times 5 mb 'files'
-    num_files = int(num_gb // 0.005)
-    return torch.randint(0, 10, (num_files, 625000), device="cpu", dtype=torch.int64)
+    # pretend to have x times 500 kb 'files'
+    num_files = int(num_gb // 0.0005) + 1
+    print(f'{num_files=}')
+    tensor = torch.randint(0, 10, (num_files, 500_000//64), device="cpu", dtype=torch.int64)
+
+    lst = [t.clone() for t in torch.split(tensor, num_files, dim=0)]
+    del tensor
+
+    return lst
 
 
 def pprint_ntuple(nt):
@@ -24,15 +30,15 @@ def pprint_ntuple(nt):
 
 class VirtualMemoryDataset(IterableDataset):
     def __init__(self, gb):
-        self.tensor = get_n_gb_of_memory(gb)
+        self.tensor_lst = get_n_gb_of_memory(gb)
 
     def __len__(self):
-        return 200
+        return len(self.tensor_lst)
 
     def __iter__(self):
         while True:
-            for i in range(int(self.tensor.shape[0])):
-                yield self.tensor[i]
+            for i in range(len(self.tensor_lst)):
+                yield self.tensor_lst[i]
 
 
 def print_memory_info():
@@ -70,7 +76,7 @@ def main():
     print("starting 'train' loop")
     validation_every_x_iters = 5
     for idx, _ in enumerate(DataLoader(train_set, batch_size=None, num_workers=num_workers)):
-        print(f"memory usage in iteration {idx+1} iteration of loop")
+        print(f"memory usage in iteration {idx+1} iteration of train loop")
         print_memory_info()
 
         if (idx+1) % validation_every_x_iters == 0:
