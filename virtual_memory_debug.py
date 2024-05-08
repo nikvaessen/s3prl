@@ -70,7 +70,7 @@ def main():
     print("starting 'train' loop")
     validation_every_x_iters = 5
     for idx, _ in enumerate(DataLoader(train_set, batch_size=None, num_workers=num_workers)):
-        print(f"memory usage in {idx+1} iteration of loop")
+        print(f"memory usage in iteration {idx+1} iteration of loop")
         print_memory_info()
 
         if idx > 0 and idx % validation_every_x_iters == 0:
