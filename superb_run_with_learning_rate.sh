@@ -18,7 +18,7 @@ fi
 # set arguments
 NAME="$1"
 UPSTREAM="$2"
-UPSTREAM_PATH="$3"
+UPSTREAM_PATH=$(realpath "$3")
 
 # default LR if not given
 if [[ -n "$4" ]]; then
