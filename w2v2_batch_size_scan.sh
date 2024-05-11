@@ -7,7 +7,7 @@ if [[ -z "$2" ]]; then
     exit 1
 fi
 
-JOBNAME=$(dirname "$DIR")
+JOBNAME=$(basename "$DIR")
 
 find "$DIR" -name "*000000050000*" -exec echo sbatch --array=0,4,7,10-15,18-21 slurm_snellius.sbatch "$JOBNAME"-050k-"$LR" wav2vec2_custom {} "$LR" \;
 find "$DIR" -name "*000000100000*" -exec echo sbatch --array=0,4,7,10-15,18-21 slurm_snellius.sbatch "$JOBNAME"-100k-"$LR" wav2vec2_custom {} "$LR" \;
