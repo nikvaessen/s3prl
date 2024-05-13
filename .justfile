@@ -19,32 +19,69 @@ install-dependencies:
 setup-data: ls100h speech-commands cv-v4-translate cv-v7-ood SBCDAE quesst14 vc1 librimix iemocap fluent snips vcc2020 voicebank
 
 place-manual-downloads dir_with_archives:
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/iemocap/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/fluent/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/snips/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/voicebank/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/librimix/download/
-    mkdir -p "${ADF_DOWNLOAD_DIR}"/quesst14/download/
+    # SBCSAE
+    # has a manageable one-time download
 
+    # cv-v4-translate
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
+    rsync {{dir_with_archives}}/en.tar.gz "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
+
+    # cv-v7-ood
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-ar.tar.gz    "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-es.tar.gz    "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-zh-CN.tar.gz "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
+
+    # fluent
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/fluent/download/
+    rsync {{dir_with_archives}}/fluent.zip "${ADF_DOWNLOAD_DIR}"/fluent/download/
+
+    # IEMOCAP
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/iemocap/download/
     rsync {{dir_with_archives}}/IEMOCAP_full_release_withoutVideos.tar.gz "${ADF_DOWNLOAD_DIR}"/iemocap/download/
-    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-ar.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-es.tar.gz        "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync {{dir_with_archives}}/cv-corpus-7.0-2021-07-21-zh-CN.tar.gz     "${ADF_DOWNLOAD_DIR}"/cv-v7-ood/download/
-    rsync {{dir_with_archives}}/en.tar.gz                                 "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
-    rsync {{dir_with_archives}}/fluent.zip                                "${ADF_DOWNLOAD_DIR}"/fluent/download/
-    rsync {{dir_with_archives}}/snips.zip                                 "${ADF_DOWNLOAD_DIR}"/snips/download/
-    rsync {{dir_with_archives}}/vox1_dev_wav.zip                          "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    rsync {{dir_with_archives}}/vox1_test_wav.zip                         "${ADF_DOWNLOAD_DIR}"/vc1/download/
-    rsync {{dir_with_archives}}/hifigan_vctk+vcc2020.tar.gz               "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    rsync {{dir_with_archives}}/pwg_task1.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    rsync {{dir_with_archives}}/pwg_task2.tar.gz                          "${ADF_DOWNLOAD_DIR}"/vcc2020/download/models/
-    rsync {{dir_with_archives}}/noisy-vctk-16k.zip                        "${ADF_DOWNLOAD_DIR}"/voicebank/download/
-    rsync {{dir_with_archives}}/wham_noise.zip                            "${ADF_DOWNLOAD_DIR}"/librimix/download/
-    rsync {{dir_with_archives}}/quesst14Database.tgz                      "${ADF_DOWNLOAD_DIR}"/quesst14/download/
+
+    # librimix
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/wham_noise.zip "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/dev-clean.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/dev-other.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/test-clean.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/test-other.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/train-clean-100.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+    rsync {{dir_with_archives}}/train-clean-360.tar.gz "${ADF_DOWNLOAD_DIR}"/librimix/download/
+
+    # ls100h
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+    rsync {{dir_with_archives}}/dev-clean.tar.gz "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+    rsync {{dir_with_archives}}/dev-other.tar.gz "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+    rsync {{dir_with_archives}}/test-clean.tar.gz "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+    rsync {{dir_with_archives}}/test-other.tar.gz "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+    rsync {{dir_with_archives}}/train-clean-100.tar.gz "${ADF_DOWNLOAD_DIR}"/ls100h/download/
+
+    # quesst14
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/quesst14/download/
+    rsync {{dir_with_archives}}/quesst14Database.tgz "${ADF_DOWNLOAD_DIR}"/quesst14/download/
+
+    # snips
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/snips/download/
+    rsync {{dir_with_archives}}/snips.zip "${ADF_DOWNLOAD_DIR}"/snips/download/
+
+    # speech-commands
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/speech-commands/download/
+    rsync {{dir_with_archives}}/speech_commands_test_set_v0.01.tar.gz "${ADF_DOWNLOAD_DIR}"/speech-commands/download/
+    rsync {{dir_with_archives}}/speech_commands_v0.01.tar.gz "${ADF_DOWNLOAD_DIR}"/speech-commands/download/
+
+    # vc1
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/vc1/download/
+    rsync {{dir_with_archives}}/vox1_dev_wav.zip "${ADF_DOWNLOAD_DIR}"/vc1/download/
+    rsync {{dir_with_archives}}/vox1_test_wav.zip "${ADF_DOWNLOAD_DIR}"/vc1/download/
+
+    # vcc2020
+    # has a manageable one-time download from gdrive
+
+    # voicebank
+    mkdir -p "${ADF_DOWNLOAD_DIR}"/voicebank/download/
+    rsync {{dir_with_archives}}/noisy-vctk-16k.zip "${ADF_DOWNLOAD_DIR}"/voicebank/download/
 
 # setup the librispeech dataset
 ls100h:
