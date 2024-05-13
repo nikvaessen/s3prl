@@ -83,25 +83,30 @@ speech-commands:
     just --unstable speech-commands::setup
     cd ..
 
-cv-v7-ood:
+cv-v7-ood: (_cv-v7-ood 'es') (_cv-v7-ood 'ar') (_cv-v7-ood 'zh-CN')
+
+_cv-v7-ood lang:
     #!/usr/bin/env bash
     set -e
 
+    # lang can be one of es, ar, zh-CN
+    printf "es\nar\nzh-CN\n" | grep --line-regexp -q '{{lang}}'
+
     # setup paths
     mkdir -p {{superb-data-dir}}
-    rm -f {{superb-data-dir}}/cv-v7-ood
+    rm -f {{superb-data-dir}}/cv-v7-ood-{{lang}}
 
     # create symlink
-    ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/cv-v7-ood
+    ln -s {{adf-work-dir}}/cv-v7-ood-{{lang}}/extract/ {{superb-data-dir}}/cv-v7-ood-{{lang}}
 
     # setup data
     cd adf
-    just --unstable cv-v7-ood::setup
+    just --unstable cv-v7-ood::download cv-v7-ood::extract-{{lang}}
     cd ..
 
     # pre-process data
     cd s3prl/downstream/ctc/corpus/
-    bash preprocess_cv.sh {{superb-data-dir}}/cv-v7-ood/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/cv-v7-ood
+    bash preprocess_cv.sh {{superb-data-dir}}/cv-v7-ood/cv-corpus-7.0-2021-07-21 {{superb-data-dir}}/cv-v7-ood {{lang}}
     cd ../../../
 
 SBCDAE:
