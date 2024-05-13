@@ -134,7 +134,7 @@ _cv-v7-ood lang:
     rm -f {{superb-data-dir}}/cv-v7-ood-{{lang}}
 
     # create symlink
-    ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/cv-v7-ood-{{lang}}
+    ln -s {{adf-work-dir}}/cv-v7-ood/extract/ {{superb-data-dir}}/cv-v7-ood
 
     # setup data
     cd adf
