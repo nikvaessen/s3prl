@@ -20,7 +20,7 @@ setup-data: ls100h speech-commands cv-v4-translate cv-v7-ood SBCDAE quesst14 vc1
 
 place-manual-downloads dir_with_archives:
     # SBCSAE
-    # has a manageable one-time download
+    echo has a manageable one-time download
 
     # cv-v4-translate
     mkdir -p "${ADF_DOWNLOAD_DIR}"/cv-v4-translate/download/
@@ -77,7 +77,7 @@ place-manual-downloads dir_with_archives:
     rsync {{dir_with_archives}}/vox1_test_wav.zip "${ADF_DOWNLOAD_DIR}"/vc1/download/
 
     # vcc2020
-    # has a manageable one-time download from gdrive
+    echo has a manageable one-time download
 
     # voicebank
     mkdir -p "${ADF_DOWNLOAD_DIR}"/voicebank/download/
