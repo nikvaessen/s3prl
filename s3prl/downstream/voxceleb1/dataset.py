@@ -15,20 +15,17 @@ import glob
 import tqdm
 from pathlib import Path
 
-CACHE_PATH = os.path.join(os.path.dirname(__file__), '.cache/')
-
-
 # Voxceleb 1 Speaker Identification
 class SpeakerClassifiDataset(Dataset):
     def __init__(self, mode, file_path, meta_data, max_timestep=None):
 
         self.root = file_path
         self.speaker_num = 1251
-        self.meta_data =meta_data
+        self.meta_data = meta_data
         self.max_timestep = max_timestep
         self.usage_list = open(self.meta_data, "r").readlines()
 
-        cache_path = os.path.join(CACHE_PATH, f'{mode}.pkl')
+        cache_path = os.path.join(file_path, "cache", f'{mode}.pkl')
         if os.path.isfile(cache_path):
             print(f'[SpeakerClassifiDataset] - Loading file paths from {cache_path}')
             with open(cache_path, 'rb') as cache:
