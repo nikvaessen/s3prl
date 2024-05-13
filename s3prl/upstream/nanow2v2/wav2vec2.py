@@ -462,7 +462,7 @@ class Wav2vec2(nn.Module):
         # mask some time steps in the speech features to mimic specaugment
         # and to enable self-supervised learning
         if self.training or require_mask:
-            speech_features, masked_idx_per_batch = mask_speech_features(
+            masked_speech_features, masked_idx_per_batch = mask_speech_features(
                 speech_features,
                 self.masking_vector,
                 sample_lengths,
@@ -470,10 +470,11 @@ class Wav2vec2(nn.Module):
                 self.cfg.mask_span,
             )
         else:
+            masked_speech_features = speech_features
             masked_idx_per_batch = None
 
         # add relative positional embedding
-        context_features = self.rel_pos_layer(speech_features)
+        context_features = self.rel_pos_layer(masked_speech_features)
 
         # self-attention mask due to padding in batch, expanded to num attention heads
         self_attention_mask = construct_self_attention_mask(
@@ -481,7 +482,7 @@ class Wav2vec2(nn.Module):
         )
 
         # compute context features with transformer
-        feature_list = []
+        feature_list = [speech_features]
 
         for layer in self.transformer_network:
             if random.random() < self.cfg.layer_drop_prob:
