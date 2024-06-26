@@ -315,6 +315,8 @@ class RelativePositionLayer(nn.Module):
     Compute an additive relative positional embedding based on the speech features.
     """
 
+    use_new_weight_conv = False
+
     def __init__(self, num_dim: int, use_bias: bool):
         super().__init__()
 
@@ -322,9 +324,15 @@ class RelativePositionLayer(nn.Module):
         nn.init.normal_(self.conv.weight, mean=0, std=math.sqrt(4 / (num_dim * 128)))
         nn.init.constant_(self.conv.bias, 0)
 
-        torch.nn.utils.weight_norm(self.conv, dim=2)
+        self.apply_weight_norm()
 
         self.norm = LayerNorm(num_dim, use_bias)
+
+    def apply_weight_norm(self):
+        if self.use_new_weight_conv:
+            torch.nn.utils.parametrizations.weight_norm(self.conv, dim=2)
+        else:
+            torch.nn.utils.weight_norm(self.conv, dim=2)
 
     def forward(self, x: torch.Tensor):
         # x has shape [BATCH_SIZE, SEQUENCE_LENGTH, NUM_DIM]
@@ -436,7 +444,9 @@ class Wav2vec2(nn.Module):
         )
 
         # context features with transformers
-        context_features, mask = self.context_features(speech_features, sample_lengths, return_list=True)
+        context_features, mask = self.context_features(
+            speech_features, sample_lengths, return_list=True
+        )
 
         return context_features, sample_lengths
 
@@ -451,7 +461,7 @@ class Wav2vec2(nn.Module):
         speech_features: torch.Tensor,
         sample_lengths: List[int],
         require_mask: bool = False,
-        return_list: bool = False
+        return_list: bool = False,
     ) -> Tuple[torch.Tensor, List[torch.Tensor]]:
         # input has shape [BATCH_SIZE, SEQ_LENGTH, NUM_SPEECH_FEATURES]
 
