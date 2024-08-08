@@ -47,7 +47,11 @@ def get_metric(
     with result_file.open("r") as f:
         for ln in f.readlines():
             if metric_name in ln:
-                value = float(ln.strip().split(split_token)[split_idx].strip())
+                try:
+                    value = float(ln.strip().split(split_token)[split_idx].strip())
+                except IndexError:
+                    warnings.warn(f"{result_file} was unparsable")
+                    return -1
 
                 if make_percentage:
                     value *= 100
@@ -225,61 +229,65 @@ def main(result_directory: pathlib.Path, name: str):
             )
 
         elif subdir.name == "asr-ood":
-            asr_wer_es = get_metric(subdir / "es", "test wer")
-            lr_es = get_learning_rate(subdir / "es")
+            if (subdir / "es").exists():
+                asr_wer_es = get_metric(subdir / "es", "test wer")
+                lr_es = get_learning_rate(subdir / "es")
 
-            output_json.append(
-                {
-                    "checkpoint": name,
-                    "superb_task": subdir.name + "-es",
-                    "learning-rate": lr_es,
-                    "metric": "wer",
-                    "metric-is-better-when": "lower",
-                    "metric-value": asr_wer_es,
-                }
-            )
+                output_json.append(
+                    {
+                        "checkpoint": name,
+                        "superb_task": subdir.name + "-es",
+                        "learning-rate": lr_es,
+                        "metric": "wer",
+                        "metric-is-better-when": "lower",
+                        "metric-value": asr_wer_es,
+                    }
+                )
 
-            asr_wer_ar = get_metric(subdir / "ar", "test wer")
-            lr_ar = get_learning_rate(subdir / "ar")
+            if (subdir / "ar").exists():
+                asr_wer_ar = get_metric(subdir / "ar", "test wer")
+                lr_ar = get_learning_rate(subdir / "ar")
 
-            output_json.append(
-                {
-                    "checkpoint": name,
-                    "superb_task": subdir.name + "-ar",
-                    "learning-rate": lr_ar,
-                    "metric": "wer",
-                    "metric-is-better-when": "lower",
-                    "metric-value": asr_wer_ar,
-                }
-            )
+                output_json.append(
+                    {
+                        "checkpoint": name,
+                        "superb_task": subdir.name + "-ar",
+                        "learning-rate": lr_ar,
+                        "metric": "wer",
+                        "metric-is-better-when": "lower",
+                        "metric-value": asr_wer_ar,
+                    }
+                )
 
-            asr_cer_zh = get_metric(subdir / "zh-CN", "test cer")
-            lr_zh = get_learning_rate(subdir / "zh-CN")
+            if (subdir / "zh-CN").exists():
+                asr_cer_zh = get_metric(subdir / "zh-CN", "test cer")
+                lr_zh = get_learning_rate(subdir / "zh-CN")
 
-            output_json.append(
-                {
-                    "checkpoint": name,
-                    "superb_task": subdir.name + "-zh",
-                    "learning-rate": lr_zh,
-                    "metric": "cer",
-                    "metric-is-better-when": "lower",
-                    "metric-value": asr_cer_zh,
-                }
-            )
+                output_json.append(
+                    {
+                        "checkpoint": name,
+                        "superb_task": subdir.name + "-zh",
+                        "learning-rate": lr_zh,
+                        "metric": "cer",
+                        "metric-is-better-when": "lower",
+                        "metric-value": asr_cer_zh,
+                    }
+                )
 
-            asr_wer_spoken = get_metric(subdir / "sbcsae", "test wer")
-            lr_spoken = get_learning_rate(subdir / "sbcsae")
+            if (subdir / "sbcsae").exists():
+                asr_wer_spoken = get_metric(subdir / "sbcsae", "test wer")
+                lr_spoken = get_learning_rate(subdir / "sbcsae")
 
-            output_json.append(
-                {
-                    "checkpoint": name,
-                    "superb_task": subdir.name + "-spoken",
-                    "learning-rate": lr_spoken,
-                    "metric": "wer",
-                    "metric-is-better-when": "lower",
-                    "metric-value": asr_wer_spoken,
-                }
-            )
+                output_json.append(
+                    {
+                        "checkpoint": name,
+                        "superb_task": subdir.name + "-spoken",
+                        "learning-rate": lr_spoken,
+                        "metric": "wer",
+                        "metric-is-better-when": "lower",
+                        "metric-value": asr_wer_spoken,
+                    }
+                )
 
         elif subdir.name == "asv":
             asv_eer = get_metric(subdir, "achieves EER", split_token=" ", split_idx=5)
