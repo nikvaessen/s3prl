@@ -37,9 +37,11 @@ def to_steps(x: str):
 
 def to_desc(x):
     if x <= 150:
-        return f"{x:} sec"
+        r = f"{int(x)} sec"
     else:
-        return f"{x//60} min"
+        r = f"{int(x//60):d} min"
+
+    return r
 
 
 def from_desc(x):
