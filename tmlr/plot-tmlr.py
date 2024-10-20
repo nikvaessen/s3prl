@@ -6,7 +6,8 @@ df = pd.read_json("tmlr.json", lines=True)
 
 
 def to_batch_size_in_sec(x: str):
-    _, gpu, _ = x.split("-")
+    split_values = x.split("-")
+    gpu = split_values[1]
 
     if gpu == "0gpu":
         bs = 87.5
@@ -22,6 +23,13 @@ def to_batch_size_in_sec(x: str):
         bs = 150 * 16
     elif gpu == "32gpu":
         bs = 150 * 32
+    elif gpu == "vc2":
+        if split_values[2] == "5min":
+            bs = 60 * 5
+        elif split_values[2] == "40min":
+            bs = 60 * 40
+        else:
+            raise ValueError(f"unknown {split_values=}")
     else:
         raise ValueError(f"{gpu=} is unknown")
 
@@ -29,8 +37,15 @@ def to_batch_size_in_sec(x: str):
 
 
 def to_steps(x: str):
-    _, _, steps = x.split("-")
-    steps_as_int = int(steps.removesuffix("k")) * 1000
+    split_values = x.split("-")
+    steps_as_int = None
+
+    for s in split_values:
+        if s.endswith("k"):
+            steps_as_int = int(s.removesuffix("k")) * 1000
+
+    if steps_as_int is None:
+        raise ValueError(f"cannot extract steps from {split_values=}")
 
     return steps_as_int
 
