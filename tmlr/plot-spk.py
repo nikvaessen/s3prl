@@ -2,7 +2,13 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_json("vc2.json", lines=True)
+df1 = pd.read_json("vc2.json", lines=True)
+df1["dataset"] = "vc2"
+
+df2 = pd.read_json("tmlr.json", lines=True)
+df2["dataset"] = "ls"
+
+df = pd.concat([df1, df2])
 
 
 def to_batch_size_in_sec(x: str):
@@ -107,6 +113,8 @@ for task in tasks:
         y="metric-value",
         hue="batch size",
         hue_order=hue_order,
+        style="dataset",
+        style_order=["ls", "vc2"],
         marker="o",
     )
     plt.title(task)
