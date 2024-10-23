@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class UpstreamExpert(torch.nn.Module):
-    def __init__(self, ckpt, **kwds):
+    def __init__(self, ckpt, is_large=False, *args, **kwds):
         super().__init__()
 
         ckpt = torch.load(ckpt, map_location="cpu")
@@ -31,7 +31,18 @@ class UpstreamExpert(torch.nn.Module):
         del state["project_quantized_feature.weight"]
         del state["project_quantized_feature.bias"]
 
-        self.network = Wav2vec2(Wav2vec2Config())
+        if is_large:
+            self.network = Wav2vec2(
+                Wav2vec2Config(
+                    num_layers=24,
+                    num_heads=16,
+                    num_dim_context=1024,
+                    num_dim_fnn=1024 * 4,
+                )
+            )
+        else:
+            self.network = Wav2vec2(Wav2vec2Config())
+
         self.network.load_state_dict(state)
 
     def get_downsample_rates(self, key: str = None) -> int:

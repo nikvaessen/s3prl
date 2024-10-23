@@ -1,0 +1,6 @@
+{"checkpoint":"tmlr-vc2-40min-100k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":91.6688621044159}
+{"checkpoint":"tmlr-vc2-40min-050k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":90.66701531410217}
+{"checkpoint":"tmlr-vc2-5min-100k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":79.48853373527527}
+{"checkpoint":"tmlr-vc2-5min-300k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":87.29237914085388}
+{"checkpoint":"tmlr-vc2-5min-400k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":90.0079071521759}
+{"checkpoint":"tmlr-vc2-5min-200k","superb_task":"ic","learning-rate":0.0001,"metric":"acc","metric-is-better-when":"higher","metric-value":85.05141139030457}
