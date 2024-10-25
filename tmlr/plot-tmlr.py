@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_json("large.json", lines=True)
+df = pd.read_json("vc2.json", lines=True)
 
 
 def to_batch_size_in_sec(x: str):
@@ -26,6 +26,8 @@ def to_batch_size_in_sec(x: str):
     elif gpu == "vc2" or gpu == "nibg" or gpu == "large":
         if split_values[2] == "5min":
             bs = 60 * 5
+        elif split_values[2] == "10min":
+            bs = 60 * 5 * 2
         elif split_values[2] == "40min":
             bs = 60 * 40
         else:
