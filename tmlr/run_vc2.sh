@@ -1,6 +1,7 @@
 # complete --array=0,1,4,8,10-14,15
 
 ARRAY='0,1,4,8,10-14,15'
+ARRAY='1,8,15'
 
 # 5 min
 sbatch --array=$ARRAY slurm_snellius.sbatch tmlr-vc2-5min-100k nanow2v2 ~/data/nanow2v2/extra/vc2/5min/step_0100000.progress.ckpt 1e-4
