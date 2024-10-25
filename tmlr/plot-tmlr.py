@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_json("vc2.json", lines=True)
+df = pd.read_json("large.json", lines=True)
 
 
 def to_batch_size_in_sec(x: str):
@@ -23,7 +23,7 @@ def to_batch_size_in_sec(x: str):
         bs = 150 * 16
     elif gpu == "32gpu":
         bs = 150 * 32
-    elif gpu == "vc2" or gpu == "nibg":
+    elif gpu == "vc2" or gpu == "nibg" or gpu == "large":
         if split_values[2] == "5min":
             bs = 60 * 5
         elif split_values[2] == "40min":
@@ -82,7 +82,7 @@ print(hue_order)
 
 sns.set_style("darkgrid")
 
-for task in tasks:
+for task in ['ic']:
     plt.clf()
 
     task_df = df.loc[df["superb_task"] == task]
