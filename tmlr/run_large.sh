@@ -4,9 +4,7 @@ ARRAY='0,1,4,8,10-14,15'
 ARRAY='1,15'
 
 # did 15:
-# 5 min
-# 10 min
-# 40 min 50k and 100k
+# all but 200k and 250k 40 mins
 
 # did 1
 # all but 200k and 250k 40 mins
