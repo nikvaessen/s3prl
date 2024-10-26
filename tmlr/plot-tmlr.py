@@ -2,7 +2,18 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_json("vc2.json", lines=True)
+# file = "large.json"
+file = "vc2.json"
+# file = "tmlr.json"
+
+if file == "large.json":
+    name = "with LARGE and Librispeech"
+elif file == "vc2.json":
+    name = "with BASE and VoxCeleb2"
+else:
+    name = "with BASE and Librispeech"
+
+df = pd.read_json(file, lines=True)
 
 
 def to_batch_size_in_sec(x: str):
@@ -75,6 +86,9 @@ df["batch size"] = df["batch_size"].apply(to_desc)
 df["steps"] = df["checkpoint"].apply(to_steps)
 df["hours_seen"] = df["batch_size"] * df["steps"] / 3600
 
+print(df.to_string())
+df = df.drop(df.loc[df["metric-value"] == -1].index)
+
 # print(df.to_string())
 tasks = df["superb_task"].unique()
 hue_order = sorted(df["batch size"].unique(), key=from_desc)
@@ -116,5 +130,5 @@ for task in tasks:
     plt.xlabel("hours seen during self-supervised pre-training")
     plt.xscale("log")
     g.set_xticks([5000, 10_000, 50_000, 100_000, 500_000, 1_000_000])
-    plt.title(title)
+    plt.title(title + f" {name}")
     plt.show()
