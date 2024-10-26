@@ -84,7 +84,7 @@ print(hue_order)
 
 sns.set_style("darkgrid")
 
-for task in ["ic"]:
+for task in tasks:
     plt.clf()
 
     task_df = df.loc[df["superb_task"] == task]
